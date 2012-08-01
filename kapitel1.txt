@@ -1,0 +1,236 @@
+
+￼ 
+￼ 
+
+
+Animation as a Threaded Canvas 
+A JPanel is employed as a drawing surface, and an animation loop is embedded inside a thread local to the panel. The loop consists of three stages: game update, rendering, and a short sleep. 
+The code in Example 2-1 shows the main elements of GamePanel, including the run( ) method containing the animation loop. As the chapter progresses, additional methods and global variables will be added to GamePanel, and some of the existing methods (especially run( )) will be changed and extended. 
+Example 2-1. The GamePanel class (initial version) 
+
+public class GamePanel extends JPanel implements Runnable
+{
+  private static final int PWIDTH = 500;   // size of panel
+  private static final int PHEIGHT = 400;
+
+  private Thread animator;            // for the animation
+  private volatile boolean running = false;    // stops the animation
+
+  private volatile boolean gameOver = false;   // for game termination
+
+  // more variables, explained later
+  //       :
+
+  public GamePanel( )
+  {    setBackground(Color.white);    // white background
+    setPreferredSize( new Dimension(PWIDTH, PHEIGHT));
+
+    // create game components
+    // ...
+  }  // end of GamePanel( )
+
+
+  public void addNotify( )
+  /* Wait for the JPanel to be added to the
+     JFrame/JApplet before starting. */
+  {
+    super.addNotify( );   // creates the peer
+    startGame( );         // start the thread
+  }
+
+
+  private void startGame( )
+  // initialise and start the thread
+  {
+    if (animator == null || !running) {
+      animator = new Thread(this);
+      animator.start( );
+    }
+  } // end of startGame( )
+
+  public void stopGame( )
+  // called by the user to stop execution
+  {  running = false;   }
+
+
+  public void run( )
+  /* Repeatedly update, render, sleep */
+  {
+    running = true;
+    while(running) {
+      gameUpdate( );   // game state is updated
+      gameRender( );   // render to a buffer
+      repaint( );      // paint with the buffer
+
+      try {
+        Thread.sleep(20);  // sleep a bit
+      }
+      catch(InterruptedException ex){}
+    }
+    System.exit(0);   // so enclosing JFrame/JApplet exits
+  } // end of run( )
+
+
+  private void gameUpdate( )
+  { if (!gameOver)      // update game state ...
+  }
+
+  // more methods, explained later...
+
+}  // end of GamePanel class
+
+
+GamePanel acts as a fixed size white canvas, which will be embedded inside a JFrame in applications and inside JApplet in applets. The embedding will only require minor changes, except when GamePanel is used in applications using full-screen exclusive mode (FSEM). Even in that case, the animation loop will stay essentially the same. 
+addNotify( ) is called automatically as GamePanel is being added to its enclosing GUI component (e.g., a JFrame or JApplet), so it is a good place to initiate the animation thread (animator). stopGame( ) will be called from the enclosing JFrame/JApplet when the user wants the program to terminate; it sets a global Boolean, running, to false. 
+
+Just Stop It 
+Some authors suggest using THRead's stop( ) method, a technique deprecated by Sun. stop( ) causes a thread to terminate immediately, perhaps while it is changing data structures or manipulating external resources, leaving them in an inconsistent state. The running Boolean is a better solution because it allows the programmer to decide how the animation loop should finish. The drawback is that the code must include tests to detect the termination flag.
+
+
+
+Synchronization Concerns 
+The executing GamePanel object has two main threads: the animator thread for game updates and rendering, and a GUI event processing thread, which responds to such things as key presses and mouse movements. When the user presses a key to stop the game, this event dispatch thread will execute stopGame( ). It will set running to false at the same time the animation thread is executing. 
+Once a program contains two or more threads utilizing a shared variable, data structure, or resource, then thorny synchronization problems may appear. For example, what will happen if a shared item is changed by one thread at the same moment that the other one reads it? The Java Memory Model (JMM) states that accesses and updates to all variables, other than longs or doubles, are atomic, i.e., the JMM supports 32-bit atomicity. For example, an assignment to a Boolean cannot be interleaved with a read. This means that the changing of the running flag by stopGame( ) cannot occur at the same moment that the animation thread is reading it. 
+The atomicity of read and writes to Booleans is a useful property. However, the possibility of synchronization problems for more complex data structures cannot be ignored, as you'll see in Chapter 3. 
+Application and Game Termination 
+A common pitfall is to use a Boolean, such as running, to denote application termination and game termination. The end of a game occurs when the player wins (or loses), but this is typically not the same as stopping the application. For instance, the end of the game may be followed by the user entering details into a high scores table or by the user being given the option to play again. Consequently, I represent game ending by a separate Boolean, gameOver. It can be seen in gameUpdate( ), controlling the game state change. 
+Why Use Volatile? 
+The JMM lets each thread have its own local memory (e.g., registers) where it can store copies of variables, thereby improving performance since the variables can be manipulated more quickly. The drawback is that accesses to these variables by other threads see the original versions in main memory and not the local copies. 
+The running and gameOver variables are candidates for copying to local memory in the GamePanel tHRead. This will cause problems since other threads use these variables. running is set to false by stopGame( ) called from the GUI thread (gameOver is set to true by the GUI thread as well, as I'll explain later). Since running and gameOver are manipulated by the GUI thread and not the animation thread, the original versions in main memory are altered and the local copies used by the animation thread are unaffected. One consequence is that the animation thread will never stop since its local version of running will never become false! 
+This problem is avoided by affixing the volatile keyword to running and gameOver. volatile prohibits a variable from being copied to local memory; the variable stays in main memory. Thus, changes to that variable by other threads will be seen by the animation thread. 
+Why Sleep? 
+The animation loop includes an arbitrary 20 ms of sleep time: 
+
+        while(running) {
+          gameUpdate( );   // game state is updated
+          gameRender( );   // render to a buffer
+          repaint( );      // paint with the buffer
+
+          try {
+            Thread.sleep(20);  // sleep a bit          }
+          catch(InterruptedException ex){}
+        }
+
+
+Why is this necessary? There are three main reasons. 
+The first is that sleep( ) causes the animation thread to stop executing, which frees up the CPU for other tasks, such as garbage collection by the JVM. Without a period of sleep, the GamePanel thread could hog all the CPU time. However, the 20-ms sleep time is somewhat excessive, especially when the loop is executing 50 or 100 times per second. 
+The second reason for the sleep( ) call is to give the preceding repaint( ) time to be processed. The call to repaint( ) places a repaint request in the JVM's event queue and then returns. Exactly how long the request will be held in the queue before triggering a repaint is beyond my control; the sleep( ) call makes the thread wait before starting the next update/rendering cycle, to give the JVM time to act. The repaint request will be processed, percolating down through the components of the application until GamePanel's paintComponent( ) is called. An obvious question is whether 20 ms is sufficient time for the request to be carried out. Perhaps it's overly generous? 
+It may seem that I should choose a smaller sleep time, 5 ms perhaps. However, any fixed sleep time may be too long or too short, depending on the current game activity and the speed of the particular machine. 
+Finally, the sleep( ) call reduces the chance of event coalescence: If the JVM is overloaded by repaint requests, it may choose to combine requests. This means that some of the rendering request will be skipped, causing the animation to "jump" as frames are lost. 
+Double Buffering Drawing 
+gameRender( ) draws into its own Graphics object (dbg), which represents an image the same size as the screen (dbImage). 
+
+    // global variables for off-screen rendering
+    private Graphics dbg;
+    private Image dbImage = null;
+
+    private void gameRender( )
+    // draw the current frame to an image buffer
+    {
+      if (dbImage == null){  // create the buffer
+        dbImage = createImage(PWIDTH, PHEIGHT);
+        if (dbImage == null) {
+          System.out.println("dbImage is null");
+          return;
+        }
+        else
+          dbg = dbImage.getGraphics( );
+      }
+
+      // clear the background
+      dbg.setColor(Color.white);
+      dbg.fillRect (0, 0, PWIDTH, PHEIGHT);
+
+      // draw game elements
+      // ...
+
+      if (gameOver)
+        gameOverMessage(dbg);
+    }  // end of gameRender( )
+
+
+    private void gameOverMessage(Graphics g)
+    // center the game-over message
+    { // code to calculate x and y...
+      g.drawString(msg, x, y);
+    }  // end of gameOverMessage( )
+
+
+This technique is known as double buffering since the (usually complex) drawing operations required for rendering are not applied directly to the screen but to a secondary image. 
+The dbImage image is placed on screen by paintComponent( ) as a result of the repaint request in the run( ) loop. This call is only made after the rendering step has been completed: 
+
+    public void paintComponent(Graphics g)
+    {
+      super.paintComponent(g);
+      if (dbImage != null)
+        g.drawImage(dbImage, 0, 0, null);
+    }
+
+
+The principal advantage of double buffering is to reduce on-screen flicker. If extensive drawing is done directly to the screen, the process may take long enough to become noticeable by the user. The call to drawImage( ) in paintComponent( ) is fast enough that the change from one frame to the next is perceived as instantaneous. 
+Another reason for keeping paintComponent( ) simple is that it may be called by the JVM independently of the animation thread. For example, this will occur when the application (or applet) window has been obscured by another window and then brought back to the front. 
+
+
+￼
+The placing of game behavior inside paintComponent() is a common mistake. This results in the animation being driven forward by its animation loop and by the JVM repainting the window. 
+
+
+
+
+Adding User Interaction 
+In full-screen applications, there will be no additional GUI elements, such as text fields or Swing buttons. Even in applets or windowed applications, the user will probably want to interact directly with the game canvas as much as is possible. This means that GamePanel must monitor key presses and mouse activity. 
+GamePanel utilizes key presses to set the running Boolean to false, which terminates the animation loop and application. Mouse presses are processed by testPress( ), using the cursor's (x, y) location in various ways (details are given in later chapters). 
+The GamePanel( ) constructor is modified to set up the key and mouse listeners: 
+
+    public GamePanel( )
+    {
+      setBackground(Color.white);
+      setPreferredSize( new Dimension(PWIDTH, PHEIGHT));
+
+      setFocusable(true);
+      requestFocus( );    // JPanel now receives key events
+      readyForTermination( );
+
+      // create game components
+      // ...
+
+      // listen for mouse presses
+      addMouseListener( new MouseAdapter( ) {
+        public void mousePressed(MouseEvent e)
+        { testPress(e.getX( ), e.getY( )); }
+      });
+    }  // end of GamePanel( )
+
+
+readyForTermination( ) watches for key presses that signal termination and sets running to false. testPress( ) does something with the cursor's (x, y) coordinate but only if the game hasn't finished yet: 
+
+    private void readyForTermination( )
+    {
+      addKeyListener( new KeyAdapter( ) {
+      // listen for esc, q, end, ctrl-c
+         public void keyPressed(KeyEvent e)
+         { int keyCode = e.getKeyCode( );
+           if ((keyCode == KeyEvent.VK_ESCAPE) ||
+               (keyCode == KeyEvent.VK_Q) ||
+               (keyCode == KeyEvent.VK_END) ||
+               ((keyCode == KeyEvent.VK_C) && e.isControlDown( )) ) {
+             running = false;
+           }
+         }
+       });
+    }  // end of readyForTermination( )
+
+
+
+    private void testPress(int x, int y)
+    // is (x,y) important to the game?
+    {
+      if (!gameOver) {
+        // do something
+      }
+    }
+
+￼
+
+￼ 
+￼ 
