@@ -1,161 +1,214 @@
+/**
+ * Hoffentlich lauffaehige Engine mit Vollbildmodus FSEM
+ * 07. September 2012
+ */
+
 package gui;
 
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.DisplayMode;
+import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.*;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.image.BufferStrategy;
+import javax.swing.JFrame;
 
-import javax.swing.JPanel;
+public class GamePanel extends JFrame implements Runnable {
+    private static int MAX_FRAME_SKIPS = 5; // was 2;
+    private static final int NO_DELAYS_PER_YIELD = 16;
+    private static final int NUM_BUFFERS = 2;
+    private static int DEFAULT_FPS = 100;
+    private static final long serialVersionUID = 7773333380423469665L;
 
-public class GamePanel extends JPanel implements Runnable {
+    /**
+     * Main-Methode, welche den Konstruktor Engine aufruft und das Spiel startet
+     */
+    public static void main(String args[]) {
+    	int fps = DEFAULT_FPS;
+    	long period = (long) 1000.0 / fps;
+        new GamePanel(period * 1000000L);
+    }
 
-	// global variables for off-screen rendering
-	private Graphics dbg;
-	private Image dbImage = null;
-	private String msg = "End";
-	
+    private Thread animator; // Der Thread der die Animation behandelt
+    private BufferStrategy bufferStrategy;
+    private boolean finishedOff = false;
+    private Font font;
+    private volatile boolean gameOver = false;
+    private long gameStartTime;
+    private GraphicsDevice gd;
+    private Graphics gScr;
+    private volatile boolean isPaused = false;
+    private long period; // period between drawing in _nanosecs_
+    private int pWidth, pHeight; // Groesse des Panels einstellen
+    private volatile boolean running = false; // Beende Animation
+	private long prevStatsTime;
+	private int boxesUsed;
+	private int framesSkipped;
 
-	private static final int PWIDTH = 500; // size of panel
-	private static final int PHEIGHT = 400;
-
-	private Thread animator; // for the animation
-	private volatile boolean running = false; // stops the animation
-
-	private volatile boolean gameOver = false; // for game termination
-
-	// more variables, explained later
-	// :
-
-	public GamePanel() {
-		setBackground(Color.white);
-		setPreferredSize(new Dimension(PWIDTH, PHEIGHT));
-
-		setFocusable(true);
-		requestFocus(); // JPanel now receives key events
-		readyForTermination();
-
-		// create game components
-		// ...
-
-		// listen for mouse presses
-		addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				testPress(e.getX(), e.getY());
-			}
-		});
-	} // end of GamePanel( )
-
-	public void addNotify()
-	/*
-	 * Wait for the JPanel to be added to the JFrame/JApplet before starting.
+	/**
+	 * Kontruktor
 	 */
-	{
-		super.addNotify(); // creates the peer
-		startGame(); // start the thread
-	}
+    public GamePanel(long period) {
+        super("Insane Engine!");
+        this.period = period;
+        initFullScreen();
+        gameStart();
+    }
 
-	private void startGame()
-	// initialise and start the thread
-	{
-		if (animator == null || !running) {
-			animator = new Thread(this);
-			animator.start();
-		}
-	} // end of startGame( )
+    /**
+     * Bevor das Spiel komplett beendet wird, werden noch diese Aufgaben ausgefuehrt
+     */
+    private void finishOff() {
+        if (!finishedOff) {
+            finishedOff = true;
+            restoreScreen();
+            System.exit(0);
+        }
+    }
 
-	public void stopGame()
-	// called by the user to stop execution
-	{
-		running = false;
-	}
+    private void gameRender(Graphics gScr) {
+        // clear the background
+        gScr.setColor(Color.white);
+        gScr.fillRect(0, 0, pWidth, pHeight);
+        gScr.setColor(Color.blue);
+        gScr.setFont(font);
+        gScr.setColor(Color.black);
+        if (gameOver) {
+            System.out.println("Spiel zu Ende");
+        }
+    }
 
-	public void run()
-	/* Repeatedly update, render, sleep */
-	{
+    private void gameStart() {
+        if (animator == null || !running) {
+            animator = new Thread(this);
+            animator.start();
+        }
+    } 
 
-		while (running) {
-			gameUpdate(); // game state is updated
-			gameRender(); // render to a buffer
-			repaint(); // paint with the buffer
+    private void gameUpdate() {
+        if (!isPaused && !gameOver) {
+            /** Hier Bewegungskram reinpacken*/
+        }
+    } 
 
-			try {
-				Thread.sleep(20); // sleep a bit
-			} catch (InterruptedException ex) {
-			}
-		}
+    /**
+     * Aktiviere Fullscreen
+     */
+    private void initFullScreen() {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        gd = ge.getDefaultScreenDevice();
+        setUndecorated(true);
+        setIgnoreRepaint(true);
+        setResizable(false);
+        if (!gd.isFullScreenSupported()) {
+            System.out.println("Vollbildmodus konnte nicht aktiviert werden!");
+            System.exit(0);
+        }
+        gd.setFullScreenWindow(this);
+        showCurrentMode();
+        pWidth = getBounds().width;
+        pHeight = getBounds().height;
+        setBufferStrategy();
+    }
 
-		System.exit(0); // so enclosing JFrame/JApplet exits
-	} // end of run( )
+    /**
+     * Vollbildmodus verlassen und ggf. alte Aufloesung wiederherstellen
+     */
+    private void restoreScreen() {
+        Window w = gd.getFullScreenWindow();
+        if (w != null) {
+            w.dispose();
+        }
+        gd.setFullScreenWindow(null);
+    }
 
-	private void gameUpdate() {
-		if (!gameOver) {
-			// update game state ...
-		}
-	}
+    public void run() {
+        long beforeTime, afterTime, timeDiff, sleepTime;
+        long overSleepTime = 0L;
+        int noDelays = 0;
+        long excess = 0L;
+        gameStartTime = System.nanoTime();
+        prevStatsTime = gameStartTime;
+        beforeTime = gameStartTime;
+        running = true;
+        while (running) {
+            gameUpdate();
+            screenUpdate();
+            afterTime = System.nanoTime();
+            timeDiff = afterTime - beforeTime;
+            sleepTime = period - timeDiff - overSleepTime;
+            if (sleepTime > 0) { // some time left in this cycle
+                try {
+                    Thread.sleep(sleepTime / 1000000L); // nano -> ms
+                } catch (InterruptedException ex) {
+                }
+                overSleepTime = System.nanoTime() - afterTime - sleepTime;
+            } else { 
+                excess -= sleepTime; 
+                overSleepTime = 0L;
+                if (++noDelays >= NO_DELAYS_PER_YIELD) {
+                    Thread.yield(); 
+                    noDelays = 0;
+                }
+            }
+            beforeTime = System.nanoTime();
+            int skips = 0;
+            while (excess > period && skips < MAX_FRAME_SKIPS) {
+                excess -= period;
+                gameUpdate(); // update state but don't render
+                skips++;
+            }
+            framesSkipped += skips;
+        }
+        finishOff();
+    } 
 
-	// more methods, explained later...
+    private void screenUpdate() {
+        try {
+            gScr = bufferStrategy.getDrawGraphics();
+            gameRender(gScr);
+            gScr.dispose();
+            if (!bufferStrategy.contentsLost()) {
+                bufferStrategy.show();
+            } else {
+                System.out.println("Contents Lost");
+            }
+            Toolkit.getDefaultToolkit().sync();
+        } catch (Exception e) {
+            e.printStackTrace();
+            running = false;
+        }
+    }
 
-	private void gameRender()
-	// draw the current frame to an image buffer
-	{
-		if (dbImage == null) { // create the buffer
-			dbImage = createImage(PWIDTH, PHEIGHT);
-			if (dbImage == null) {
-				System.out.println("dbImage is null");
-				return;
-			} else
-				dbg = dbImage.getGraphics();
-		}
+    public void setBoxNumber(int no) {
+        boxesUsed = no;
+    }
 
-		// clear the background
-		dbg.setColor(Color.white);
-		dbg.fillRect(0, 0, PWIDTH, PHEIGHT);
+    private void setBufferStrategy() {
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+                public void run() {
+                    createBufferStrategy(NUM_BUFFERS);
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("Buffer-Strategie konnte nicht angewendet werden.");
+            System.exit(0);
+        }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ex) {
+        }
+        bufferStrategy = getBufferStrategy();
+    }
 
-		// draw game elements
-		// ...
-
-		if (gameOver)
-			gameOverMessage(dbg);
-	} // end of gameRender( )
-
-	private void gameOverMessage(Graphics g)
-	// center the game-over message
-	{ // code to calculate x and y...
-		g.drawString(msg, 10, 10);
-	} // end of gameOverMessage( )
-
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		if (dbImage != null)
-			g.drawImage(dbImage, 0, 0, null);
-	}
-
-	private void readyForTermination() {
-		addKeyListener(new KeyAdapter() {
-			// listen for esc, q, end, ctrl-c
-			public void keyPressed(KeyEvent e) {
-				int keyCode = e.getKeyCode();
-				if ((keyCode == KeyEvent.VK_ESCAPE)
-						|| (keyCode == KeyEvent.VK_Q)
-						|| (keyCode == KeyEvent.VK_END)
-						|| ((keyCode == KeyEvent.VK_C) && e.isControlDown())) {
-					running = false;
-				}
-			}
-		});
-	} // end of readyForTermination( )
-
-	private void testPress(int x, int y)
-	// is (x,y) important to the game?
-	{
-		if (!gameOver) {
-			// do something
-		}
-	}
-
-} // end of GamePanel class
+    private void showCurrentMode() {
+        DisplayMode dm = gd.getDisplayMode();
+        System.out.println("Display Modus: (" + dm.getWidth() + "," + dm.getHeight() + "," + dm.getBitDepth() + "," + dm.getRefreshRate()
+                + ")  ");
+    }
+}
