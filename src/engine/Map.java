@@ -59,7 +59,12 @@ public class Map {
 		int tileheight = Integer.parseInt(att.getNamedItem("tileheight").getNodeValue());
 		int spacing = Integer.parseInt(att.getNamedItem("spacing").getNodeValue());
 		int margin = Integer.parseInt(att.getNamedItem("margin").getNodeValue());
-		return new Tileset(fgid, name, tilewidth, tileheight, spacing, margin);
+		Node node = MapXML.getElementsByTagName("tileset").item(index).getChildNodes().item(0);
+		String source = node.getAttributes().getNamedItem("source").getNodeValue();
+		int imgwidth = Integer.parseInt(node.getAttributes().getNamedItem("width").getNodeValue());
+		int imgheight = Integer.parseInt(node.getAttributes().getNamedItem("height").getNodeValue());	
+		String trans = node.getAttributes().getNamedItem("trans").getNodeValue();
+		return new Tileset(fgid, name, tilewidth, tileheight, spacing, margin, source, imgwidth, imgheight, trans);
 	}
 	
 	//*************** End of Getter **************************//

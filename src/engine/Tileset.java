@@ -2,16 +2,41 @@ package engine;
 
 public class Tileset {
 	
-	private int firstgid, tilewidth, tileheight, spacing, margin;
-	private String name;
+	private int firstgid, tilewidth, tileheight, spacing, margin, imagewidth, imageheight;
+	private String name, imagesource, imagetransparency;
+
 	
-	public Tileset(int firstgid, String name, int tilewidth, int tileheight, int spacing, int margin){
+	public Tileset(int firstgid, String name, int tilewidth, int tileheight, int spacing, int margin, String imgsource, int imgwidth,
+					int imgheight, String imgtrans){
 		this.firstgid = firstgid;
 		this.name = name;
 		this.tileheight = tileheight;
 		this.tilewidth = tilewidth;
 		this.spacing = spacing;
 		this.margin = margin;
+		this.imagesource = imgsource;
+		this.imagewidth = imgwidth;
+		this.imageheight = imgheight;
+		this.imagetransparency = imgtrans;
+	}
+
+	public int getImagewidth() {
+		return imagewidth;
+	}
+
+
+	public int getImageheight() {
+		return imageheight;
+	}
+
+
+	public String getImagesource() {
+		return imagesource;
+	}
+
+
+	public String getImagetransparency() {
+		return imagetransparency;
 	}
 	
 
