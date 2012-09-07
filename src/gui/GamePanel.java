@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.DisplayMode;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
@@ -17,6 +17,7 @@ import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
+
 import javax.swing.JFrame;
 
 public class GamePanel extends JFrame implements Runnable {
@@ -42,7 +43,9 @@ public class GamePanel extends JFrame implements Runnable {
     private volatile boolean gameOver = false;
     private long gameStartTime;
     private GraphicsDevice gd;
-    private Graphics gScr;
+    private int mWidth;
+    private int mHeight;
+    private Graphics2D gScr;
     private volatile boolean isPaused = false;
     private long period; // period between drawing in _nanosecs_
     private int pWidth, pHeight; // Groesse des Panels einstellen
@@ -50,6 +53,8 @@ public class GamePanel extends JFrame implements Runnable {
 	private long prevStatsTime;
 	private int boxesUsed;
 	private int framesSkipped;
+	private boolean isInMenue = true;
+	private static int positionInMainMenu = 0;
 
 	/**
 	 * Kontruktor
@@ -73,18 +78,27 @@ public class GamePanel extends JFrame implements Runnable {
         }
     }
 
-    private void gameRender(Graphics gScr) {
-        // clear the background
+    /**
+     * Menuehandling muss hier auch mit rein, da man auf die Graphics2D gScr 
+     * zugreifen muss
+     */
+    private void gameRender(Graphics2D gScr) {
+        // Hintergrund faerben
         gScr.setColor(Color.white);
         gScr.fillRect(0, 0, pWidth, pHeight);
-        gScr.setColor(Color.blue);
         gScr.setFont(font);
         gScr.setColor(Color.black);
+        if (isInMenue) {
+        	new menu.MainMenu(gScr, positionInMainMenu, mWidth, mHeight);
+        }
         if (gameOver) {
             System.out.println("Spiel zu Ende");
         }
     }
 
+    /**
+     * Gamethread starten
+     */
     private void gameStart() {
         if (animator == null || !running) {
             animator = new Thread(this);
@@ -92,9 +106,12 @@ public class GamePanel extends JFrame implements Runnable {
         }
     } 
 
+    /**
+     * Hauptmethode zur Aktualisierung des Spiels
+     */
     private void gameUpdate() {
         if (!isPaused && !gameOver) {
-            /** Hier Bewegungskram reinpacken*/
+        	/** Bewegungskram hier rein! */
         }
     } 
 
@@ -174,7 +191,6 @@ public class GamePanel extends JFrame implements Runnable {
         addKeyListener(new KeyAdapter() {
             // listen for esc, q, end, ctrl-c on the canvas to
             // allow a convenient exit from the full screen configuration
-            @Override
             public void keyPressed(KeyEvent e) {
                 int keyCode = e.getKeyCode();
                 if (keyCode == KeyEvent.VK_ESCAPE || keyCode == KeyEvent.VK_Q || keyCode == KeyEvent.VK_END || keyCode == KeyEvent.VK_C
@@ -196,7 +212,7 @@ public class GamePanel extends JFrame implements Runnable {
     
     private void screenUpdate() {
         try {
-            gScr = bufferStrategy.getDrawGraphics();
+            gScr = (Graphics2D) bufferStrategy.getDrawGraphics();
             gameRender(gScr);
             gScr.dispose();
             if (!bufferStrategy.contentsLost()) {
@@ -235,7 +251,13 @@ public class GamePanel extends JFrame implements Runnable {
 
     private void showCurrentMode() {
         DisplayMode dm = gd.getDisplayMode();
-        System.out.println("Display Modus: (" + dm.getWidth() + "," + dm.getHeight() + "," + dm.getBitDepth() + "," + dm.getRefreshRate()
+        mWidth = dm.getWidth();
+        mHeight = dm.getHeight();
+        System.out.println("Display Modus: (" + mWidth + "," + mHeight + "," + dm.getBitDepth() + "," + dm.getRefreshRate()
                 + ")  ");
+    }
+    
+    public static void setPositionInMainMenu(int pos) {
+    	positionInMainMenu = pos;
     }
 }
