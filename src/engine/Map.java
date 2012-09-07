@@ -7,11 +7,22 @@ import org.w3c.dom.*;
 public class Map {
 	
 	private Document MapXML;
+	private Layer[] layers;
 	
 	public Map(String MapTMX /* path to *TMX */ ){
 		// create a new Mapinstance with the corresponding XMl-Document and name
 		XMLReader reader = new XMLReader();
 		MapXML = reader.getDocument(MapTMX);
+		
+		// create Layers Array
+		layers = new Layer[MapXML.getElementsByTagName("layer").getLength()];
+		for(int i=0; i < layers.length; i++){
+			layers[i] = new Layer(
+					MapXML.getElementsByTagName("layer").item(i).getAttributes().getNamedItem("name").getNodeValue(),
+					MapXML.getElementsByTagName("layer").item(i).getTextContent()
+			);
+		}
+		
 	}
 	
 	//*************** Map-Attribute-Getter *******************//
@@ -52,6 +63,7 @@ public class Map {
 	}
 	
 	public Tileset getTileset(int index){ //returns Tileset #index
+		// Doesnt support <tile> inside of <tileset> at the moment (needed for Properties) 
 		NamedNodeMap att = MapXML.getElementsByTagName("tileset").item(index).getAttributes();
 		int fgid = Integer.parseInt(att.getNamedItem("firstgid").getNodeValue());
 		String name = att.getNamedItem("name").getNodeValue();
@@ -65,6 +77,18 @@ public class Map {
 		int imgheight = Integer.parseInt(node.getAttributes().getNamedItem("height").getNodeValue());	
 		String trans = node.getAttributes().getNamedItem("trans").getNodeValue();
 		return new Tileset(fgid, name, tilewidth, tileheight, spacing, margin, source, imgwidth, imgheight, trans);
+	}
+	
+	public int getLayerAmount(){ //returns Amount of layers
+		return layers.length;
+	}
+	
+	public String getLayerName(int index){
+		return layers[index].getName();
+	}
+	
+	public String getLayerTiles(int index){
+		return layers[index].getTiles();
 	}
 	
 	//*************** End of Getter **************************//

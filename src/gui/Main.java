@@ -13,5 +13,8 @@ public class Main {
 		System.out.println(island.getHeightInTiles());
 		System.out.println(island.getTileWidth());
 		System.out.println(island.getTileHeight());
+		
+		System.out.println(island.getLayerName(0));
+		System.out.println(island.getLayerTiles(0));
 	}
 }
