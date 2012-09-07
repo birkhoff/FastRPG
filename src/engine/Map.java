@@ -7,11 +7,46 @@ import org.w3c.dom.*;
 public class Map {
 	
 	private Document MapXML;
+	private Tileset[] tilesets;
+	private Layer[] layers;
 	
 	public Map(String MapTMX /* path to *TMX */ ){
 		// create a new Mapinstance with the corresponding XMl-Document and name
 		XMLReader reader = new XMLReader();
 		MapXML = reader.getDocument(MapTMX);
+		
+		//create Tileset-Array
+		tilesets = new Tileset[MapXML.getElementsByTagName("tileset").getLength()];
+		for(int i=0; i < tilesets.length; i++){
+			NamedNodeMap att = MapXML.getElementsByTagName("tileset").item(i).getAttributes();
+			int fgid = Integer.parseInt(att.getNamedItem("firstgid").getNodeValue());
+			String name = att.getNamedItem("name").getNodeValue();
+			int tilewidth = Integer.parseInt(att.getNamedItem("tilewidth").getNodeValue());
+			int tileheight = Integer.parseInt(att.getNamedItem("tileheight").getNodeValue());
+			int spacing = 0;
+			
+			//TODO NullpointerException
+			if(att.getNamedItem("spacing").getNodeValue() == null) {
+				spacing = Integer.parseInt(att.getNamedItem("spacing").getNodeValue()); }
+			int margin = 0;
+			if (att.getNamedItem("margin").getNodeValue() != null) {
+				margin = Integer.parseInt(att.getNamedItem("margin").getNodeValue()); }
+			Node node = MapXML.getElementsByTagName("image").item(i);
+			String source = node.getAttributes().getNamedItem("source").getNodeValue();
+			int imgwidth = Integer.parseInt(node.getAttributes().getNamedItem("width").getNodeValue());
+			int imgheight = Integer.parseInt(node.getAttributes().getNamedItem("height").getNodeValue());	
+			tilesets[i] = new Tileset(fgid, name, tilewidth, tileheight, spacing, margin, source, imgwidth, imgheight);
+		}
+		
+		// create Layers Array
+		layers = new Layer[MapXML.getElementsByTagName("layer").getLength()];
+		for(int i=0; i < layers.length; i++){
+			layers[i] = new Layer(
+					MapXML.getElementsByTagName("layer").item(i).getAttributes().getNamedItem("name").getNodeValue(),
+					MapXML.getElementsByTagName("layer").item(i).getTextContent()
+			);
+		}
+		
 	}
 	
 	//*************** Map-Attribute-Getter *******************//
@@ -48,18 +83,24 @@ public class Map {
 	}
 	
 	public int tilesetAmount(){  //retuns the amount of tilesets this map uses
-		return MapXML.getElementsByTagName("tileset").getLength();
+		return tilesets.length;
 	}
 	
 	public Tileset getTileset(int index){ //returns Tileset #index
-		NamedNodeMap att = MapXML.getElementsByTagName("tileset").item(index).getAttributes();
-		int fgid = Integer.parseInt(att.getNamedItem("firstgid").getNodeValue());
-		String name = att.getNamedItem("name").getNodeValue();
-		int tilewidth = Integer.parseInt(att.getNamedItem("tilewidth").getNodeValue());
-		int tileheight = Integer.parseInt(att.getNamedItem("tileheight").getNodeValue());
-		int spacing = Integer.parseInt(att.getNamedItem("spacing").getNodeValue());
-		int margin = Integer.parseInt(att.getNamedItem("margin").getNodeValue());
-		return new Tileset(fgid, name, tilewidth, tileheight, spacing, margin);
+		// Doesnt support <tile> inside of <tileset> at the moment (needed for Properties) 
+		return tilesets[index];
+	}
+	
+	public int getLayerAmount(){ //returns Amount of layers
+		return layers.length;
+	}
+	
+	public String getLayerName(int index){
+		return layers[index].getName();
+	}
+	
+	public String getLayerTiles(int index){
+		return layers[index].getTiles();
 	}
 	
 	//*************** End of Getter **************************//
