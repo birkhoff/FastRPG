@@ -26,11 +26,13 @@ public class Map {
 			int spacing = 0;
 			
 			//TODO NullpointerException
-			if(att.getNamedItem("spacing").getNodeValue() == null) {
-				spacing = Integer.parseInt(att.getNamedItem("spacing").getNodeValue()); }
+			try {
+				spacing = Integer.parseInt(att.getNamedItem("spacing").getNodeValue());
+			} catch (Exception e) { /**/ }
 			int margin = 0;
-			if (att.getNamedItem("margin").getNodeValue() != null) {
-				margin = Integer.parseInt(att.getNamedItem("margin").getNodeValue()); }
+			try {
+				margin = Integer.parseInt(att.getNamedItem("margin").getNodeValue());
+			} catch (Exception e) { /**/ }
 			Node node = MapXML.getElementsByTagName("image").item(i);
 			String source = node.getAttributes().getNamedItem("source").getNodeValue();
 			int imgwidth = Integer.parseInt(node.getAttributes().getNamedItem("width").getNodeValue());
