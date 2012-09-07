@@ -14,6 +14,8 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 
@@ -56,6 +58,7 @@ public class GamePanel extends JFrame implements Runnable {
         super("Insane Engine!");
         this.period = period;
         initFullScreen();
+        readyForTermination();
         gameStart();
     }
 
@@ -167,6 +170,30 @@ public class GamePanel extends JFrame implements Runnable {
         finishOff();
     } 
 
+    private void readyForTermination() {
+        addKeyListener(new KeyAdapter() {
+            // listen for esc, q, end, ctrl-c on the canvas to
+            // allow a convenient exit from the full screen configuration
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int keyCode = e.getKeyCode();
+                if (keyCode == KeyEvent.VK_ESCAPE || keyCode == KeyEvent.VK_Q || keyCode == KeyEvent.VK_END || keyCode == KeyEvent.VK_C
+                        && e.isControlDown()) {
+                    running = false;
+                }
+            }
+        });
+        // for shutdown tasks
+        // a shutdown may not only come from the program
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                running = false;
+                finishOff();
+            }
+        });
+    }
+    
     private void screenUpdate() {
         try {
             gScr = bufferStrategy.getDrawGraphics();
