@@ -1,5 +1,5 @@
 /**
- * Hoffentlich lauffaehige Engine mit Vollbildmodus FSEM
+ * Fullscreen FSEM Engine
  * 07. September 2012
  */
 
@@ -16,9 +16,12 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
+
+import chars.*;
 
 public class GamePanel extends JFrame implements Runnable {
     private static int MAX_FRAME_SKIPS = 5; // was 2;
@@ -27,16 +30,13 @@ public class GamePanel extends JFrame implements Runnable {
     private static int DEFAULT_FPS = 100;
     private static final long serialVersionUID = 7773333380423469665L;
 
-    /**
-     * Main-Methode, welche den Konstruktor Engine aufruft und das Spiel startet
-     */
     public static void main(String args[]) {
     	int fps = DEFAULT_FPS;
     	long period = (long) 1000.0 / fps;
         new GamePanel(period * 1000000L);
     }
 
-    private Thread animator; // Der Thread der die Animation behandelt
+    private Thread animator; // start thread who handles the animation
     private BufferStrategy bufferStrategy;
     private boolean finishedOff = false;
     private Font font;
@@ -48,19 +48,23 @@ public class GamePanel extends JFrame implements Runnable {
     private Graphics2D gScr;
     private volatile boolean isPaused = false;
     private long period; // period between drawing in _nanosecs_
-    private int pWidth, pHeight; // Groesse des Panels einstellen
-    private volatile boolean running = false; // Beende Animation
+    private int pWidth, pHeight; // size of panel
+    private volatile boolean running = false; 
 	private long prevStatsTime;
 	private int boxesUsed;
 	private int framesSkipped;
 	private boolean isInMenue = true;
 	private static int positionInMainMenu = 0;
 
+	// Objects
+	private Hero hero;
+	
 	/**
 	 * Kontruktor
 	 */
     public GamePanel(long period) {
         super("Insane Engine!");
+        addKeyListener(new GameListener());
         this.period = period;
         initFullScreen();
         readyForTermination();
@@ -88,14 +92,15 @@ public class GamePanel extends JFrame implements Runnable {
         gScr.fillRect(0, 0, pWidth, pHeight);
         gScr.setFont(font);
         gScr.setColor(Color.black);
-        if (isInMenue) {
-        	new menu.MainMenu(gScr, positionInMainMenu, mWidth, mHeight);
-        }
+        drawHero(gScr);					// get ya hero on the screen!
+//        if (isInMenue) {
+//        	new menu.MainMenu(gScr, positionInMainMenu, mWidth, mHeight);
+//        }
         if (gameOver) {
             System.out.println("Spiel zu Ende");
         }
     }
-
+    
     /**
      * Gamethread starten
      */
@@ -112,8 +117,11 @@ public class GamePanel extends JFrame implements Runnable {
     private void gameUpdate() {
         if (!isPaused && !gameOver) {
         	/** Bewegungskram hier rein! */
+        	
+        	
         }
     } 
+      
 
     /**
      * Aktiviere Fullscreen
@@ -155,6 +163,7 @@ public class GamePanel extends JFrame implements Runnable {
         prevStatsTime = gameStartTime;
         beforeTime = gameStartTime;
         running = true;
+        hero = new Hero();	// create insane hero!
         while (running) {
             gameUpdate();
             screenUpdate();
@@ -259,5 +268,28 @@ public class GamePanel extends JFrame implements Runnable {
     
     public static void setPositionInMainMenu(int pos) {
     	positionInMainMenu = pos;
+    }
+ 
+    /******************** Draw methods for objects *********************/
+    private void drawHero(Graphics2D g) {
+    	g.drawImage(hero.getImage(), hero.getPositionX(), hero.getPositionY(), null);
+    }
+
+    /**
+     * Alles moegliche, um Tastatureingaben zu lesen. 
+     */
+    class GameListener implements KeyListener {
+    	public void keyPressed(KeyEvent e) {
+    		switch (e.getKeyCode()) {
+    			case 37: hero.setPositionX(hero.getPositionX()-2); break;
+    			case 38: hero.setPositionY(hero.getPositionY()-2); break;
+    			case 39: hero.setPositionX(hero.getPositionX()+2); break;
+    			case 40: hero.setPositionY(hero.getPositionY()+2); break;
+    		}
+    	}
+		@Override
+		public void keyReleased(KeyEvent e) {}
+		@Override
+		public void keyTyped(KeyEvent e) {}
     }
 }
