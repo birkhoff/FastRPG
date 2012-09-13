@@ -6,7 +6,7 @@ public class Main {
 
 	public static void main(String[] args){
 		Map island = new Map("maps/map1.tmx");
-		System.out.println(island.getOrientation());
+		System.out.println("Orientation:" + island.getOrientation());
 		System.out.println(island.getWidth());
 		System.out.println(island.getHeight());
 		System.out.println(island.getWidthInTiles());
@@ -25,6 +25,7 @@ public class Main {
 		System.out.println(island.getObjectgroup(0).getObjetcs()[0].getName());
 		System.out.println(island.getObjectgroup(0).getObjetcs()[0].getType());
 		System.out.println(island.getObjectgroup(0).getObjetcs()[0].getPropertie(0).getName());
+		System.out.println(island.getObjectgroup(0).getObjetcs()[0].getPropertie(0).getValue());
 		
 		
 	}
