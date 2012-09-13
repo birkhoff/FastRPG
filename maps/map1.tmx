@@ -12,10 +12,6 @@
  <tileset firstgid="49" name="Test" tilewidth="32" tileheight="32">
   <image source="../../../drinking_games/ragedrinkrt6cb.png" width="4200" height="2600"/>
  </tileset>
- <objectgroup name="Objects" width="30" height="20">
-  <object name="SpawnPoint" x="320" y="551"/>
-  <object x="318" y="299"/>
- </objectgroup>
  <layer name="Background" width="30" height="20">
   <data encoding="csv">
 6,6,7,6,6,7,8,23,9,10,11,26,25,26,26,8,8,16,23,24,24,23,24,32,31,32,31,32,32,32,
@@ -40,6 +36,13 @@
 38,38,38,46,46,47,48,32,32,32,40,40,40,40,48,42,43,30,30,30,38,46,47,48,30,31,30,31,38,46
 </data>
  </layer>
+ <objectgroup name="Objects" width="30" height="20">
+  <object name="Spawnpoint" type="Monster" x="574" y="178" width="30" height="26">
+   <properties>
+    <property name="cocki" value="hure"/>
+   </properties>
+  </object>
+ </objectgroup>
  <layer name="Collision" width="30" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

@@ -1,7 +1,14 @@
 package engine;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.*;
+import java.io.File;
+import java.io.IOException;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.DOMOutputter;
+import org.jdom2.output.XMLOutputter;
 
 // Has the ability to read out *TMX-Files and build a Map out of them
 public class Map {
@@ -9,11 +16,19 @@ public class Map {
 	private Document MapXML;
 	private Tileset[] tilesets;
 	private Layer[] layers;
+	private Objectgroup[] objectgroups;
 	
 	public Map(String MapTMX /* path to *TMX */ ){
-		// create a new Mapinstance with the corresponding XMl-Document and name
-		XMLReader reader = new XMLReader();
-		MapXML = reader.getDocument(MapTMX);
+		
+		SAXBuilder parser = new SAXBuilder();
+        try {
+            Document doc = parser.build(MapTMX);
+        } catch (JDOMException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+        		ex.printStackTrace();
+        }
+        
 		
 		//create Tileset-Array
 		tilesets = new Tileset[MapXML.getElementsByTagName("tileset").getLength()];
@@ -47,6 +62,37 @@ public class Map {
 					MapXML.getElementsByTagName("layer").item(i).getAttributes().getNamedItem("name").getNodeValue(),
 					MapXML.getElementsByTagName("layer").item(i).getTextContent()
 			);
+		}
+		
+		//create Objectgroup Array
+		objectgroups = new Objectgroup[MapXML.getElementsByTagName("objectgroup").getLength()];
+		for(int i=0; i < objectgroups.length; i++){
+			Node node = MapXML.getElementsByTagName("objectgroup").item(i);
+			node.getAttributes().getNamedItem("name").getNodeValue();
+			NodeList entitys = node.
+			Entity[] ents = new Entity[entitys.getLength()];
+			for(int j=0; j < entitys.getLength(); j++){
+				String name = entitys.item(j).getAttributes().getNamedItem("name").getNodeValue();
+				int x = Integer.parseInt(entitys.item(j).getAttributes().getNamedItem("x").getNodeValue());
+				int y = Integer.parseInt(entitys.item(j).getAttributes().getNamedItem("y").getNodeValue());
+				Entity tempEnt = new Entity(name, x, y);
+				tempEnt.setHeight(Integer.parseInt(entitys.item(j).getAttributes().getNamedItem("height").getNodeValue()));
+				tempEnt.setWidth(Integer.parseInt(entitys.item(j).getAttributes().getNamedItem("width").getNodeValue()));
+				tempEnt.setType(entitys.item(j).getAttributes().getNamedItem("type").getNodeValue());
+				if(entitys.item(j).hasChildNodes()){
+					NodeList properties = entitys.item(j).getChildNodes();
+					Property[] tempProps = new Property[properties.item(0).getChildNodes().getLength()];
+					for(int k=0; k< properties.item(0).getChildNodes().getLength(); k++){
+						tempProps[k] = new Property(
+								properties.item(0).getChildNodes().item(k).getAttributes().getNamedItem("name").getNodeValue(),
+								properties.item(0).getChildNodes().item(k).getAttributes().getNamedItem("value").getNodeValue()
+						);
+					}
+					tempEnt.newProperties(tempProps);
+				}
+				ents[j] = tempEnt;
+			}
+			objectgroups[i] = new Objectgroup(ents, node.getAttributes().getNamedItem("name").getNodeValue());
 		}
 		
 	}
@@ -103,6 +149,14 @@ public class Map {
 	
 	public String getLayerTiles(int index){
 		return layers[index].getTiles();
+	}
+	
+	public int getObjectGroupCount(){
+		return objectgroups.length;
+	}
+	
+	public Objectgroup getObjectgroup(int i){
+		return objectgroups[i];
 	}
 	
 	//*************** End of Getter **************************//

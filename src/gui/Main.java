@@ -21,6 +21,11 @@ public class Main {
 		System.out.println(island.getLayerName(1));
 		System.out.println(island.getLayerTiles(1));
 		
+		System.out.println(island.getObjectgroup(0).getName());
+		System.out.println(island.getObjectgroup(0).getObjetcs()[0].getName());
+		System.out.println(island.getObjectgroup(0).getObjetcs()[0].getType());
+		System.out.println(island.getObjectgroup(0).getObjetcs()[0].getPropertie(0).getName());
+		
 		
 	}
 }
