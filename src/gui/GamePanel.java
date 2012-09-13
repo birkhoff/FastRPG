@@ -68,6 +68,12 @@ public class GamePanel extends JFrame implements Runnable {
 	private boolean left;
 	private boolean right;
 	
+	// Frames zaehlen
+	long firstFrame = 0;
+	long currentFrame = 0;
+	int frames = 0;
+	int fps = 0;
+	
 	// Objects
 	private Hero hero;
 	
@@ -114,6 +120,7 @@ public class GamePanel extends JFrame implements Runnable {
 			case RUN : 		break;
 			case PAUSE : 	break;
     	}
+    	gScr.drawString("FPS: "+fps, 20, 20);
         drawHero(gScr);	// get ya hero on the screen!
         if (gameOver) {
             System.out.println("Spiel zu Ende");
@@ -134,7 +141,8 @@ public class GamePanel extends JFrame implements Runnable {
      * Hauptmethode zur Aktualisierung des Spiels
      */
     private void gameUpdate() {
-        if (!isPaused && !gameOver) {
+        if (state == State.RUN) {
+        	countFPS();
         	moveHero();
         }
     } 
@@ -285,36 +293,55 @@ public class GamePanel extends JFrame implements Runnable {
     public static void setPositionInMainMenu(int pos) {
     	positionInMainMenu = pos;
     }
- 
-    /******************** Draw methods for objects *********************/
+    
+    private void countFPS() {
+    	frames++;
+    	currentFrame = System.currentTimeMillis();
+    	if(currentFrame > firstFrame + 1000){
+    		firstFrame = currentFrame;
+    		fps = frames;
+    		frames = 0;
+    	}
+    }
+    
+    /******************** Draw Methoden *********************/
     private void drawHero(Graphics2D g) {
     	if (state == State.RUN) {
     		g.drawImage(hero.getImage(), (int)hero.getPositionX(), (int)hero.getPositionY(), null);
     	}
     }
+    
+    /******************** /Draw Methoden/ *********************/
+    
+    /**
+     * Bewege den Helden!
+     */
     private void moveHero() {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
-			float dia = (float) (Math.sqrt(2*(step*step))/2);
 			boolean gone = false;
     		if (up && right) {
+    			float dia = (float) (Math.sqrt(2*(step*step))/2);
     			hero.setPositionX(hero.getPositionX()+dia);
     			hero.setPositionY(hero.getPositionY()-dia);
     			gone = true;
     		} else if (right && down) {
+    			float dia = (float) (Math.sqrt(2*(step*step))/2);
     			hero.setPositionX(hero.getPositionX()+dia);
     			hero.setPositionY(hero.getPositionY()+dia);
     			gone = true;
     		} else if (down && left) {
+    			float dia = (float) (Math.sqrt(2*(step*step))/2);
     			hero.setPositionX(hero.getPositionX()-dia);
     			hero.setPositionY(hero.getPositionY()+dia);
     			gone = true;
     		} else if (left && up) {
+    			float dia = (float) (Math.sqrt(2*(step*step))/2);
     			hero.setPositionX(hero.getPositionX()-dia);
     			hero.setPositionY(hero.getPositionY()-dia);
     			gone = true;
     		} 
-    		else if (up&&!gone) hero.setPositionY(hero.getPositionY()-1);
+    		else if (up&&!gone) 	hero.setPositionY(hero.getPositionY()-1);
     		else if (right&&!gone) 	hero.setPositionX(hero.getPositionX()+1);
     		else if (down&&!gone)	hero.setPositionY(hero.getPositionY()+1);
     		else if (left&&!gone)	hero.setPositionX(hero.getPositionX()-1);
@@ -335,7 +362,6 @@ public class GamePanel extends JFrame implements Runnable {
 	    		}
         	}
     	}
-		@Override
 		public void keyReleased(KeyEvent e) {
 			if (state == State.RUN) {
 	    		switch (e.getKeyCode()) {
