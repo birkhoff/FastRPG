@@ -2,7 +2,6 @@
  * Fullscreen FSEM Engine
  * 07. September 2012
  */
-
 package gui;
 
 import java.awt.Color;
@@ -18,10 +17,15 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-
 import javax.swing.JFrame;
-
 import chars.*;
+
+enum State {
+	INTRO, MENU, LOADLEVEL, RUN, PAUSE
+}
+enum Direction {
+	N, NE, E, SE, S, SW, W, NW, NONE
+}
 
 public class GamePanel extends JFrame implements Runnable {
     private static int MAX_FRAME_SKIPS = 5; // was 2;
@@ -55,7 +59,15 @@ public class GamePanel extends JFrame implements Runnable {
 	private int framesSkipped;
 	private boolean isInMenue = true;
 	private static int positionInMainMenu = 0;
+	private State state = State.INTRO;
 
+	// Alles zur Bewegung
+	private Direction gotoDir = Direction.NONE;
+	private boolean up;
+	private boolean down;
+	private boolean left;
+	private boolean right;
+	
 	// Objects
 	private Hero hero;
 	
@@ -92,10 +104,17 @@ public class GamePanel extends JFrame implements Runnable {
         gScr.fillRect(0, 0, pWidth, pHeight);
         gScr.setFont(font);
         gScr.setColor(Color.black);
-        drawHero(gScr);					// get ya hero on the screen!
-//        if (isInMenue) {
-//        	new menu.MainMenu(gScr, positionInMainMenu, mWidth, mHeight);
-//        }
+    	switch(state) {
+			case INTRO :	state = state.MENU;
+							break;
+			case MENU : 	new menu.MainMenu(gScr, positionInMainMenu, mWidth, mHeight);
+							state = state.RUN;
+							break;
+			case LOADLEVEL: break;
+			case RUN : 		break;
+			case PAUSE : 	break;
+    	}
+        drawHero(gScr);	// get ya hero on the screen!
         if (gameOver) {
             System.out.println("Spiel zu Ende");
         }
@@ -116,12 +135,9 @@ public class GamePanel extends JFrame implements Runnable {
      */
     private void gameUpdate() {
         if (!isPaused && !gameOver) {
-        	/** Bewegungskram hier rein! */
-        	
-        	
+        	moveHero();
         }
     } 
-      
 
     /**
      * Aktiviere Fullscreen
@@ -164,6 +180,7 @@ public class GamePanel extends JFrame implements Runnable {
         beforeTime = gameStartTime;
         running = true;
         hero = new Hero();	// create insane hero!
+        
         while (running) {
             gameUpdate();
             screenUpdate();
@@ -173,8 +190,7 @@ public class GamePanel extends JFrame implements Runnable {
             if (sleepTime > 0) { // some time left in this cycle
                 try {
                     Thread.sleep(sleepTime / 1000000L); // nano -> ms
-                } catch (InterruptedException ex) {
-                }
+                } catch (InterruptedException ex) {}
                 overSleepTime = System.nanoTime() - afterTime - sleepTime;
             } else { 
                 excess -= sleepTime; 
@@ -272,23 +288,65 @@ public class GamePanel extends JFrame implements Runnable {
  
     /******************** Draw methods for objects *********************/
     private void drawHero(Graphics2D g) {
-    	g.drawImage(hero.getImage(), hero.getPositionX(), hero.getPositionY(), null);
+    	if (state == State.RUN) {
+    		g.drawImage(hero.getImage(), (int)hero.getPositionX(), (int)hero.getPositionY(), null);
+    	}
     }
-
+    private void moveHero() {
+		if (state == State.RUN) {
+			float step = hero.getStepsize();
+			float dia = (float) (Math.sqrt(2*(step*step))/2);
+			boolean gone = false;
+    		if (up && right) {
+    			hero.setPositionX(hero.getPositionX()+dia);
+    			hero.setPositionY(hero.getPositionY()-dia);
+    			gone = true;
+    		} else if (right && down) {
+    			hero.setPositionX(hero.getPositionX()+dia);
+    			hero.setPositionY(hero.getPositionY()+dia);
+    			gone = true;
+    		} else if (down && left) {
+    			hero.setPositionX(hero.getPositionX()-dia);
+    			hero.setPositionY(hero.getPositionY()+dia);
+    			gone = true;
+    		} else if (left && up) {
+    			hero.setPositionX(hero.getPositionX()-dia);
+    			hero.setPositionY(hero.getPositionY()-dia);
+    			gone = true;
+    		} 
+    		else if (up&&!gone) hero.setPositionY(hero.getPositionY()-1);
+    		else if (right&&!gone) 	hero.setPositionX(hero.getPositionX()+1);
+    		else if (down&&!gone)	hero.setPositionY(hero.getPositionY()+1);
+    		else if (left&&!gone)	hero.setPositionX(hero.getPositionX()-1);
+    	}
+    }
     /**
      * Alles moegliche, um Tastatureingaben zu lesen. 
      */
     class GameListener implements KeyListener {
     	public void keyPressed(KeyEvent e) {
-    		switch (e.getKeyCode()) {
-    			case 37: hero.setPositionX(hero.getPositionX()-2); break;
-    			case 38: hero.setPositionY(hero.getPositionY()-2); break;
-    			case 39: hero.setPositionX(hero.getPositionX()+2); break;
-    			case 40: hero.setPositionY(hero.getPositionY()+2); break;
-    		}
+    		if (state == State.RUN) {
+	    		switch (e.getKeyCode()) {
+	    			case 37: left = true; break;
+	    			case 38: up = true; break;
+	    			case 39: right = true; break;
+	    			case 40: down = true; break;
+	    			default: break;
+	    		}
+        	}
     	}
 		@Override
-		public void keyReleased(KeyEvent e) {}
+		public void keyReleased(KeyEvent e) {
+			if (state == State.RUN) {
+	    		switch (e.getKeyCode()) {
+	    			case 37: left = false; break;
+	    			case 38: up = false; break;
+	    			case 39: right = false; break;
+	    			case 40: down = false; break;
+	    			default: break;
+	    		}
+        	}
+		}
 		@Override
 		public void keyTyped(KeyEvent e) {}
     }
