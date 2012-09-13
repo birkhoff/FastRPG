@@ -18,6 +18,7 @@ public class Hero {
 	private int hp;
 	private String name = "Insane";
 	private Look look = Look.S;
+	private float stepsize = 1f;
 	
 	public Hero() {
 		try {
@@ -66,5 +67,11 @@ public class Hero {
 	}
 	public void setLook(Look look) {
 		this.look = look;
+	}
+	public float getStepsize() {
+		return stepsize;
+	}
+	public void setStepsize(float stepsize) {
+		this.stepsize = stepsize;
 	}
 }
