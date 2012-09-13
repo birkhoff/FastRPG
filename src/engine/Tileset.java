@@ -1,9 +1,15 @@
 package engine;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class Tileset {
 	
 	private int firstgid, tilewidth, tileheight, spacing, margin, imagewidth, imageheight;
 	private String name, imagesource;
+	private List<Integer> propertyTiles; 
+	private HashMap<Integer, Property[]> propertyMap;
 
 	
 	public Tileset(int firstgid, String name, int tilewidth, int tileheight, int spacing, int margin, String imgsource, int imgwidth,
@@ -17,8 +23,26 @@ public class Tileset {
 		this.imagesource = imgsource;
 		this.imagewidth = imgwidth;
 		this.imageheight = imgheight;
+		propertyTiles = new ArrayList<Integer>();
+		propertyMap = new HashMap<Integer, Property[]>();
 	}
 
+	public void addProperty(int tileid, Property[] property){
+		propertyTiles.add(new Integer(tileid));
+		propertyMap.put(new Integer(tileid), property);
+	}
+	
+	public Property[] getProperty(int tileid){
+		return propertyMap.get(new Integer(tileid));
+	}
+	
+	public boolean hasProperty(int tileid){
+		if (propertyTiles.contains(new Integer(tileid))){
+			return true;
+		}
+		return false;
+	}
+	
 	public int getImagewidth() {
 		return imagewidth;
 	}

@@ -53,6 +53,19 @@ public class Map {
 			int imgwidth = Integer.parseInt(tileset.get(i).getChild("image").getAttributeValue("width"));
 			int imgheight = Integer.parseInt(tileset.get(i).getChild("image").getAttributeValue("height"));	
 			tilesets[i] = new Tileset(fgid, name, tilewidth, tileheight, spacing, margin, source, imgwidth, imgheight);
+			if(tileset.get(i).getChildren("tile") != null){
+				List<Element> tiles = tileset.get(i).getChildren("tile");
+				for(int j=0; j < tiles.size(); j++){
+					int tileid = Integer.parseInt(tiles.get(j).getAttributeValue("id"));
+					List<Element> props = tiles.get(j).getChildren("properties").get(0).getChildren("property");
+					Property[] propsArr = new Property[props.size()];
+					for(int k=0; k < props.size(); k++){
+						propsArr[k] = new Property(props.get(k).getAttributeValue("name"),
+												   props.get(k).getAttributeValue("value"));
+					}
+					tilesets[i].addProperty(tileid, propsArr);
+				}
+			}
 		}
 		
 		// create Layers Array
