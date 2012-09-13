@@ -8,11 +8,17 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+enum Look {
+	N, NE, E, SE, S, SW, W, NW
+}
+
 public class Hero {
-	private int position[];		// 0 = x position, 1 = y position
+	private float position[];		// 0 = x position, 1 = y position
 	private Image image;
 	private int hp;
 	private String name = "Insane";
+	private Look look = Look.S;
+	private float stepsize = 1f;
 	
 	public Hero() {
 		try {
@@ -20,46 +26,52 @@ public class Hero {
 		} catch (IOException e) {				
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
-		position = new int[2];
+		position = new float[2];
 		position[0] = 100;
 		position[1] = 100;
 	}
 	
 /******************* Getter und Setter ******************/
-	public int getPositionX() {
+	public float getPositionX() {
 		return position[0];
 	}
-	public int getPositionY() {
+	public float getPositionY() {
 		return position[1];
 	}
-	public int[] getPosition() {
+	public float[] getPosition() {
 		return position;
 	}
-	public void setPosition(int[] position) {
+	public void setPosition(float[] position) {
 		this.position = position;
 	}
-	public void setPositionX(int position) {
+	public void setPositionX(float position) {
 		this.position[0] = position;
 	}
-	public void setPositionY(int position) {
+	public void setPositionY(float position) {
 		this.position[1] = position;
 	}
-
 	public Image getImage() {
 		return image;
 	}
-
 	public void setImage(Image image) {
 		this.image = image;
 	}
-
 	public int getHp() {
 		return hp;
 	}
-
 	public void setHp(int hp) {
 		this.hp = hp;
 	}
-
-	
+	public Look getLook() {
+		return look;
+	}
+	public void setLook(Look look) {
+		this.look = look;
+	}
+	public float getStepsize() {
+		return stepsize;
+	}
+	public void setStepsize(float stepsize) {
+		this.stepsize = stepsize;
+	}
 }
