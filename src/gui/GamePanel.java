@@ -272,7 +272,7 @@ public class GamePanel extends JFrame implements Runnable {
  
     /******************** Draw methods for objects *********************/
     private void drawHero(Graphics2D g) {
-    	g.drawImage(hero.getImage(), hero.getPositionX(), hero.getPositionY(), null);
+    	g.drawImage(hero.getImage(), (int)hero.getPositionX(), (int)hero.getPositionY(), null);
     }
 
     /**

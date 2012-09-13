@@ -4,6 +4,8 @@
 package chars;
 
 import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -14,14 +16,36 @@ enum Look {
 
 public class Hero {
 	private float position[];		// 0 = x position, 1 = y position
-	private Image image;
+	private BufferedImage image;
+	BufferedImage[] hero;
 	private int hp;
 	private String name = "Insane";
 	private Look look = Look.S;
+	private int i = 0;
 	
 	public Hero() {
 		try {
-			image = ImageIO.read(new File("images/hero.png"));
+			image = ImageIO.read(new File("images/sprites/CompleteMoveSmall.png"));
+			// The above line throws an checked IOException which must be caught.
+
+			final int width = 375;
+			final int height = 500;
+			final int rows = 14;
+			final int cols = 1;
+			hero = new BufferedImage[rows * cols];
+
+			for (int i = 0; i < rows; i++)
+			{
+			    for (int j = 0; j < cols; j++)
+			    {
+			        hero[(i * cols) + j] = image.getSubimage(
+			            j * width,
+			            i * height,
+			            width,
+			            height
+			        );
+			    }
+			}
 		} catch (IOException e) {				
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
@@ -30,6 +54,9 @@ public class Hero {
 		position[1] = 100;
 	}
 	
+	public Image toImage(BufferedImage bufferedImage) {
+	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
+	}
 /******************* Getter und Setter ******************/
 	public float getPositionX() {
 		return position[0];
@@ -50,10 +77,12 @@ public class Hero {
 		this.position[1] = position;
 	}
 	public Image getImage() {
-		return image;
+		i=i+1;
+		i= i%7;
+		return toImage(hero[i]);
 	}
 	public void setImage(Image image) {
-		this.image = image;
+		this.image = (BufferedImage) image;
 	}
 	public int getHp() {
 		return hp;
