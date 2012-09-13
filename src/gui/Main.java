@@ -28,5 +28,12 @@ public class Main {
 		System.out.println(island.getObjectgroup(0).getObjetcs()[0].getPropertie(0).getValue());
 		
 		
+		System.out.println(island.getTileset(0).hasProperty(12));
+		System.out.println(island.getTileset(0).hasProperty(1));
+		System.out.println(island.getTileset(0).getProperty(12)[0].getName());
+		
+		System.out.println(island.getFormattedTiles(0)[29][19]);
+		
+		
 	}
 }
