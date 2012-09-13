@@ -163,6 +163,18 @@ public class Map {
 		return layers[index].getTiles();
 	}
 	
+	public int[][] getFormattedTiles(int index /*Tiles of which layer?!*/){
+		int[][] temp = new int[getWidthInTiles()][getHeightInTiles()];
+		String foo = getLayerTiles(index).replaceAll("\n", "");
+		String[] rows = foo.split(",");
+		for(int i=0; i < getHeightInTiles(); i++){
+			for(int j=0; j < getWidthInTiles(); j++){
+				temp[j][i] = Integer.parseInt(rows[j+(i)*30]);
+			}
+		}
+		return temp;
+	}
+	
 	public int getObjectGroupCount(){
 		return objectgroups.length;
 	}
