@@ -2,6 +2,7 @@ package engine;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -18,116 +19,114 @@ public class Map {
 	private Layer[] layers;
 	private Objectgroup[] objectgroups;
 	
+	private Document doc;
+	
 	public Map(String MapTMX /* path to *TMX */ ){
 		
 		SAXBuilder parser = new SAXBuilder();
         try {
-            Document doc = parser.build(MapTMX);
+            this.doc = parser.build(MapTMX);
         } catch (JDOMException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
         		ex.printStackTrace();
         }
-        
+         
 		
 		//create Tileset-Array
-		tilesets = new Tileset[MapXML.getElementsByTagName("tileset").getLength()];
+		tilesets = new Tileset[doc.getRootElement().getChildren("tileset").size()];
 		for(int i=0; i < tilesets.length; i++){
-			NamedNodeMap att = MapXML.getElementsByTagName("tileset").item(i).getAttributes();
-			int fgid = Integer.parseInt(att.getNamedItem("firstgid").getNodeValue());
-			String name = att.getNamedItem("name").getNodeValue();
-			int tilewidth = Integer.parseInt(att.getNamedItem("tilewidth").getNodeValue());
-			int tileheight = Integer.parseInt(att.getNamedItem("tileheight").getNodeValue());
+			List<Element> tileset = doc.getRootElement().getChildren("tileset");
+			int fgid = Integer.parseInt(tileset.get(i).getAttributeValue("firstgid"));
+			String name = tileset.get(i).getAttributeValue("name");
+			int tilewidth = Integer.parseInt(tileset.get(i).getAttributeValue("tilewidth"));
+			int tileheight = Integer.parseInt(tileset.get(i).getAttributeValue("tileheight"));
 			int spacing = 0;
-			
-			//TODO NullpointerException
-			try {
-				spacing = Integer.parseInt(att.getNamedItem("spacing").getNodeValue());
-			} catch (Exception e) { /**/ }
+			if (tileset.get(i).getAttributeValue("spacing") != null){
+				spacing = Integer.parseInt(tileset.get(i).getAttributeValue("spacing"));
+			}
 			int margin = 0;
-			try {
-				margin = Integer.parseInt(att.getNamedItem("margin").getNodeValue());
-			} catch (Exception e) { /**/ }
-			Node node = MapXML.getElementsByTagName("image").item(i);
-			String source = node.getAttributes().getNamedItem("source").getNodeValue();
-			int imgwidth = Integer.parseInt(node.getAttributes().getNamedItem("width").getNodeValue());
-			int imgheight = Integer.parseInt(node.getAttributes().getNamedItem("height").getNodeValue());	
+			if (tileset.get(i).getAttributeValue("margin") != null){
+				margin = Integer.parseInt(tileset.get(i).getAttributeValue("margin"));
+			}
+			String source = tileset.get(i).getChild("image").getAttributeValue("source");
+			int imgwidth = Integer.parseInt(tileset.get(i).getChild("image").getAttributeValue("width"));
+			int imgheight = Integer.parseInt(tileset.get(i).getChild("image").getAttributeValue("height"));	
 			tilesets[i] = new Tileset(fgid, name, tilewidth, tileheight, spacing, margin, source, imgwidth, imgheight);
 		}
 		
 		// create Layers Array
-		layers = new Layer[MapXML.getElementsByTagName("layer").getLength()];
+		layers = new Layer[doc.getRootElement().getChildren("layer").size()];
 		for(int i=0; i < layers.length; i++){
 			layers[i] = new Layer(
-					MapXML.getElementsByTagName("layer").item(i).getAttributes().getNamedItem("name").getNodeValue(),
-					MapXML.getElementsByTagName("layer").item(i).getTextContent()
+					doc.getRootElement().getChildren("layer").get(i).getAttributeValue("name"),
+					doc.getRootElement().getChildren("layer").get(i).getChildText("data")
 			);
 		}
 		
 		//create Objectgroup Array
-		objectgroups = new Objectgroup[MapXML.getElementsByTagName("objectgroup").getLength()];
+		objectgroups = new Objectgroup[doc.getRootElement().getChildren("objectgroup").size()];
 		for(int i=0; i < objectgroups.length; i++){
-			Node node = MapXML.getElementsByTagName("objectgroup").item(i);
-			node.getAttributes().getNamedItem("name").getNodeValue();
-			NodeList entitys = node.
-			Entity[] ents = new Entity[entitys.getLength()];
-			for(int j=0; j < entitys.getLength(); j++){
-				String name = entitys.item(j).getAttributes().getNamedItem("name").getNodeValue();
-				int x = Integer.parseInt(entitys.item(j).getAttributes().getNamedItem("x").getNodeValue());
-				int y = Integer.parseInt(entitys.item(j).getAttributes().getNamedItem("y").getNodeValue());
+			Element obj = doc.getRootElement().getChildren("objectgroup").get(i);
+			List<Element> entitys = obj.getChildren("object");
+			Entity[] ents = new Entity[entitys.size()];
+			for(int j=0; j < ents.length; j++){
+				String name = entitys.get(j).getAttributeValue("name");
+				int x = Integer.parseInt(entitys.get(j).getAttributeValue("x"));
+				int y = Integer.parseInt(entitys.get(j).getAttributeValue("y"));
 				Entity tempEnt = new Entity(name, x, y);
-				tempEnt.setHeight(Integer.parseInt(entitys.item(j).getAttributes().getNamedItem("height").getNodeValue()));
-				tempEnt.setWidth(Integer.parseInt(entitys.item(j).getAttributes().getNamedItem("width").getNodeValue()));
-				tempEnt.setType(entitys.item(j).getAttributes().getNamedItem("type").getNodeValue());
-				if(entitys.item(j).hasChildNodes()){
-					NodeList properties = entitys.item(j).getChildNodes();
-					Property[] tempProps = new Property[properties.item(0).getChildNodes().getLength()];
-					for(int k=0; k< properties.item(0).getChildNodes().getLength(); k++){
+				tempEnt.setHeight(Integer.parseInt(entitys.get(j).getAttributeValue("height")));
+				tempEnt.setWidth(Integer.parseInt(entitys.get(j).getAttributeValue("width")));
+				tempEnt.setType(entitys.get(j).getAttributeValue("type"));
+				if(entitys.get(j).getChildren("properties") != null){
+					List<Element> properties = entitys.get(j).getChildren("properties");
+					Property[] tempProps = new Property[properties.get(0).getChildren("property").size()];
+					for(int k=0; k< tempProps.length; k++){
 						tempProps[k] = new Property(
-								properties.item(0).getChildNodes().item(k).getAttributes().getNamedItem("name").getNodeValue(),
-								properties.item(0).getChildNodes().item(k).getAttributes().getNamedItem("value").getNodeValue()
+								properties.get(0).getChildren("property").get(k).getAttributeValue("name"),
+								properties.get(0).getChildren("property").get(k).getAttributeValue("value")
 						);
 					}
 					tempEnt.newProperties(tempProps);
 				}
 				ents[j] = tempEnt;
 			}
-			objectgroups[i] = new Objectgroup(ents, node.getAttributes().getNamedItem("name").getNodeValue());
+			objectgroups[i] = new Objectgroup(ents, obj.getAttributeValue("name"));
 		}
 		
 	}
 	
 	//*************** Map-Attribute-Getter *******************//
 	public String getOrientation(){
-		return MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("orientation").getNodeValue();
+		return doc.getRootElement().getAttributeValue("orientation");
 	}
 	
 	public int getWidth(){ //width in pixels
-		int x = Integer.parseInt(MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("tilewidth").getNodeValue());
-		int tx = Integer.parseInt(MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("width").getNodeValue());
+		int x = Integer.parseInt(doc.getRootElement().getAttributeValue("tilewidth"));
+		int tx = Integer.parseInt(doc.getRootElement().getAttributeValue("width"));
 		return x*tx;
 	}
 	
 	public int getWidthInTiles(){
-		return Integer.parseInt(MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("width").getNodeValue());
+		return Integer.parseInt(doc.getRootElement().getAttributeValue("width"));
 	}
 	
 	public int getHeightInTiles(){
-		return Integer.parseInt(MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("height").getNodeValue());
+		return Integer.parseInt(doc.getRootElement().getAttributeValue("height"));
 	}
 	
 	public int getHeight(){ //height in tiles
-		int y = Integer.parseInt(MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("tileheight").getNodeValue());
-		int ty = Integer.parseInt(MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("height").getNodeValue());
+		int y = Integer.parseInt(doc.getRootElement().getAttributeValue("tileheight"));
+		int ty = Integer.parseInt(doc.getRootElement().getAttributeValue("height"));
 		return y*ty;
 	}
 	
 	public int getTileWidth(){
-		return Integer.parseInt(MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("tilewidth").getNodeValue());
+		return Integer.parseInt(doc.getRootElement().getAttributeValue("tilewidth"));
 	}
 	
 	public int getTileHeight(){
-		return Integer.parseInt(MapXML.getElementsByTagName("map").item(0).getAttributes().getNamedItem("tileheight").getNodeValue());
+		return Integer.parseInt(doc.getRootElement().getAttributeValue("tileheight"));
 	}
 	
 	public int tilesetAmount(){  //retuns the amount of tilesets this map uses
