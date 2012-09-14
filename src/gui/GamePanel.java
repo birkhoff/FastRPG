@@ -23,9 +23,6 @@ import chars.*;
 enum State {
 	INTRO, MENU, LOADLEVEL, RUN, PAUSE
 }
-enum Direction {
-	N, NE, E, SE, S, SW, W, NW, NONE
-}
 
 public class GamePanel extends JFrame implements Runnable {
     private static int MAX_FRAME_SKIPS = 5; // was 2;
@@ -50,19 +47,16 @@ public class GamePanel extends JFrame implements Runnable {
     private int mWidth;
     private int mHeight;
     private Graphics2D gScr;
-    private volatile boolean isPaused = false;
     private long period; // period between drawing in _nanosecs_
     private int pWidth, pHeight; // size of panel
     private volatile boolean running = false; 
 	private long prevStatsTime;
 	private int boxesUsed;
 	private int framesSkipped;
-	private boolean isInMenue = true;
 	private static int positionInMainMenu = 0;
 	private State state = State.INTRO;
 
 	// Alles zur Bewegung
-	private Direction gotoDir = Direction.NONE;
 	private boolean up;
 	private boolean down;
 	private boolean left;
