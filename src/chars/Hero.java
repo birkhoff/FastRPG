@@ -102,9 +102,11 @@ public class Hero {
 	public void setLook(Look look) {
 		this.look = look;
 	}
+
 	public float getStepsize() {
 		return stepsize;
 	}
+
 	public void setStepsize(float stepsize) {
 		this.stepsize = stepsize;
 	}

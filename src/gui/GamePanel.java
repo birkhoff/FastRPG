@@ -17,6 +17,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import chars.*;
 
@@ -41,18 +46,14 @@ public class GamePanel extends JFrame implements Runnable {
     private BufferStrategy bufferStrategy;
     private boolean finishedOff = false;
     private Font font;
-    private volatile boolean gameOver = false;
     private long gameStartTime;
     private GraphicsDevice gd;
-    private int mWidth;
-    private int mHeight;
+    private int mWidth;			// Aufloesung des Monitors
+    private int mHeight;		// Aufloesung des Monitors 
     private Graphics2D gScr;
     private long period; // period between drawing in _nanosecs_
     private int pWidth, pHeight; // size of panel
     private volatile boolean running = false; 
-	private long prevStatsTime;
-	private int boxesUsed;
-	private int framesSkipped;
 	private static int positionInMainMenu = 0;
 	private State state = State.INTRO;
 
@@ -63,10 +64,19 @@ public class GamePanel extends JFrame implements Runnable {
 	private boolean right;
 	
 	// Frames zaehlen
-	long firstFrame = 0;
-	long currentFrame = 0;
-	int frames = 0;
-	int fps = 0;
+	private long firstFrame = 0;
+	private long currentFrame = 0;
+	private int frames = 0;
+	private int fps = 0;
+	
+	// Variablen zum Verschieben des Hintergrundes
+	private boolean drifting;
+	private boolean driftUp;
+	private boolean driftRight;
+	private boolean driftDown;
+	private boolean driftLeft;
+	private int bgPosX = 0;
+	private int bgPosY = 0;
 	
 	// Objects
 	private Hero hero;
@@ -101,24 +111,32 @@ public class GamePanel extends JFrame implements Runnable {
     private void gameRender(Graphics2D gScr) {
         // Hintergrund faerben
         gScr.setColor(Color.white);
-        gScr.fillRect(0, 0, pWidth, pHeight);
+        gScr.fillRect(0, 0, pWidth, pHeight);       
         gScr.setFont(font);
         gScr.setColor(Color.black);
     	switch(state) {
-			case INTRO :	state = state.MENU;
-							break;
-			case MENU : 	new menu.MainMenu(gScr, positionInMainMenu, mWidth, mHeight);
-							state = state.RUN;
-							break;
-			case LOADLEVEL: break;
-			case RUN : 		break;
-			case PAUSE : 	break;
+			case INTRO :	
+				state = state.MENU;
+				break;
+			case MENU : 	
+				new menu.MainMenu(gScr, positionInMainMenu, mWidth, mHeight);
+				state = state.RUN;
+				break;
+			case LOADLEVEL: 
+				break;
+			case RUN :
+				drawBackground(gScr);
+				drawHero(gScr);	// get ya hero on the screen!
+				break;
+			case PAUSE :
+				break;
     	}
     	gScr.drawString("FPS: "+fps, 20, 20);
-        drawHero(gScr);	// get ya hero on the screen!
-        if (gameOver) {
-            System.out.println("Spiel zu Ende");
-        }
+    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY()+", Schrittgroesse: "+hero.getStepsize(), 20, 40);
+    	gScr.drawString("Up: "+up, 20, 60);
+    	gScr.drawString("Right: "+right, 20, 80);
+    	gScr.drawString("Down: "+down, 20, 100);
+    	gScr.drawString("Left: "+left, 20, 120);
     }
     
     /**
@@ -137,6 +155,7 @@ public class GamePanel extends JFrame implements Runnable {
     private void gameUpdate() {
         if (state == State.RUN) {
         	countFPS();
+        	calcDrift();
         	moveHero();
         }
     } 
@@ -178,7 +197,6 @@ public class GamePanel extends JFrame implements Runnable {
         int noDelays = 0;
         long excess = 0L;
         gameStartTime = System.nanoTime();
-        prevStatsTime = gameStartTime;
         beforeTime = gameStartTime;
         running = true;
         hero = new Hero();	// create insane hero!
@@ -209,7 +227,6 @@ public class GamePanel extends JFrame implements Runnable {
                 gameUpdate(); // update state but don't render
                 skips++;
             }
-            framesSkipped += skips;
         }
         finishOff();
     } 
@@ -254,10 +271,6 @@ public class GamePanel extends JFrame implements Runnable {
         }
     }
 
-    public void setBoxNumber(int no) {
-        boxesUsed = no;
-    }
-
     private void setBufferStrategy() {
         try {
             EventQueue.invokeAndWait(new Runnable() {
@@ -280,8 +293,7 @@ public class GamePanel extends JFrame implements Runnable {
         DisplayMode dm = gd.getDisplayMode();
         mWidth = dm.getWidth();
         mHeight = dm.getHeight();
-        System.out.println("Display Modus: (" + mWidth + "," + mHeight + "," + dm.getBitDepth() + "," + dm.getRefreshRate()
-                + ")  ");
+        System.out.println("Display Modus: (" + mWidth + "," + mHeight + "," + dm.getBitDepth() + "," + dm.getRefreshRate()+")  ");
     }
     
     public static void setPositionInMainMenu(int pos) {
@@ -300,13 +312,53 @@ public class GamePanel extends JFrame implements Runnable {
     
     /******************** Draw Methoden *********************/
     private void drawHero(Graphics2D g) {
-
-    	g.drawImage(hero.getImage(), (int)hero.getPositionX(), (int)hero.getPositionY(), null);
     	if (state == State.RUN) {
     		g.drawImage(hero.getImage(), (int)hero.getPositionX(), (int)hero.getPositionY(), null);
     	}
     }
-    
+    private void drawBackground(Graphics2D g) {
+    	if (state == State.RUN) {    		
+//    		try {
+////    			BufferedImage konzeptBG;
+////    			konzeptBG = ImageIO.read(new File("images/konzeptBG.png"));
+////    			g.drawImage(konzeptBG, bgPosX, bgPosY, null);
+//    		} catch (IOException e) {
+//    			e.printStackTrace();
+//    		}
+    		driftUp = false;
+    		driftRight = false;
+    		driftDown = false;
+    		driftLeft = false;
+    	}
+    }
+    /**
+     * Soll den Untergrund verschieben, wenn der Held an die Kante
+     * des Bildschirms kommt.
+     */
+    private void calcDrift() {
+    	if (state == State.RUN) {
+	    	float drift = 0.2f;		// Setze 20% Kante zum scrollen
+	    	// Oberer und unterer Rand
+	    	if (hero.getPositionY() < mHeight*drift && up) {
+	    		drifting = true;
+	    		driftUp = true;
+	    		bgPosY += (int) hero.getStepsize();
+	    	} else if (hero.getPositionY() >= mHeight - (mHeight*drift) && down) {
+	    		drifting = true;
+	    		driftDown = true;
+	    		bgPosY += (int) ((-1)*hero.getStepsize());
+	    	} 
+	    	if (hero.getPositionX() < (mWidth*drift) && left) {
+	    		drifting = true;
+	    		driftLeft = true;
+	    		bgPosX += (int) hero.getStepsize();
+	    	} else if (hero.getPositionX() >= mWidth - (mWidth*drift) && right) {
+	    		drifting = true;
+	    		driftRight = true;
+	    		bgPosX += (int) ((-1)*hero.getStepsize());
+	    	}
+    	}
+    }
     /******************** /Draw Methoden/ *********************/
     
     /**
@@ -315,12 +367,13 @@ public class GamePanel extends JFrame implements Runnable {
     private void moveHero() {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
-			boolean gone = false;
+			boolean gone = false;		
+			
     		if (up && right) {
-    			float dia = (float) (Math.sqrt(2*(step*step))/2);
-    			hero.setPositionX(hero.getPositionX()+dia);
-    			hero.setPositionY(hero.getPositionY()-dia);
-    			gone = true;
+				gone = true;
+				float dia = (float) (Math.sqrt(2*(step*step))/2);
+				hero.setPositionX(hero.getPositionX()+dia);
+				hero.setPositionY(hero.getPositionY()-dia);    				
     		} else if (right && down) {
     			float dia = (float) (Math.sqrt(2*(step*step))/2);
     			hero.setPositionX(hero.getPositionX()+dia);
@@ -337,10 +390,14 @@ public class GamePanel extends JFrame implements Runnable {
     			hero.setPositionY(hero.getPositionY()-dia);
     			gone = true;
     		} 
-    		else if (up&&!gone) 	hero.setPositionY(hero.getPositionY()-1);
-    		else if (right&&!gone) 	hero.setPositionX(hero.getPositionX()+1);
-    		else if (down&&!gone)	hero.setPositionY(hero.getPositionY()+1);
-    		else if (left&&!gone)	hero.setPositionX(hero.getPositionX()-1);
+    		else if (up && !gone && !driftUp)
+    			hero.setPositionY(hero.getPositionY()-hero.getStepsize());
+    		else if (right && !gone && !driftRight)
+    			hero.setPositionX(hero.getPositionX()+hero.getStepsize());
+    		else if (down && !gone && !driftDown)
+    			hero.setPositionY(hero.getPositionY()+hero.getStepsize());
+    		else if (left && !gone && !driftLeft)
+    			hero.setPositionX(hero.getPositionX()-hero.getStepsize());
     	}
     }
     /**
