@@ -79,7 +79,7 @@ public class Hero {
 		this.position[1] = position;
 	}
 	public Image getImage() {
-		if(k>6){
+		if(k>3){
 			i=i+1;
 			k = 0;
 		}
