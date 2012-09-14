@@ -19,6 +19,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 import chars.*;
+import engine.*;
 
 enum State {
 	INTRO, MENU, LOADLEVEL, RUN, PAUSE
@@ -76,6 +77,7 @@ public class GamePanel extends JFrame implements Runnable {
 	
 	// Objects
 	private Hero hero;
+	private Map island;
 	
 	/**
 	 * Kontruktor
@@ -86,6 +88,7 @@ public class GamePanel extends JFrame implements Runnable {
         this.period = period;
         initFullScreen();
         readyForTermination();
+        island = new Map("maps/map1.tmx");
         gameStart();
     }
 
@@ -117,7 +120,8 @@ public class GamePanel extends JFrame implements Runnable {
 							state = state.RUN;
 							break;
 			case LOADLEVEL: break;
-			case RUN : 		break;
+			case RUN : 		gScr.drawImage(island.getDrawnMap(),0,0,null);
+				break;
 			case PAUSE : 	break;
     	}
     	gScr.drawString("FPS: "+fps, 20, 20);

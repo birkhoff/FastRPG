@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -111,12 +112,47 @@ public class Map {
 			}
 			objectgroups[i] = new Objectgroup(ents, obj.getAttributeValue("name"));
 		}
-		// Construction of Image to draw begins
 		drawnWorld = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
 		Graphics2D drawingBin = drawnWorld.createGraphics();
+		BufferedImage[] tileset = new BufferedImage[this.tilesetAmount()];
+		int[] fgidMap = new int[this.tilesetAmount()];
 		try {
-			BufferedImage tileset = ImageIO.read(new File("maps/" + this.getTileset(0).getImagesource()));
-			drawingBin.drawImage(tileset, 0, 0, null);
+			//Create Tilesets as BufferedImages
+			for(int i=0; i < this.tilesetAmount(); i++){
+				tileset[i] = ImageIO.read(new File("maps/" + this.getTileset(i).getImagesource()));
+				fgidMap[i] = this.getTileset(i).getFirstGid();
+			}
+			//draw them
+			for(int l=0; l < this.getLayerAmount(); l++){ //draw every layer
+															//which isn't named collision
+				if(!this.getLayerName(l).equals("collision") && !this.getLayerName(l).equals("Collision")){
+					int[][] formattedTiles = this.getFormattedTiles(l);
+					for(int i=0; i < this.getWidthInTiles(); i++){
+						for(int j=0; j < this.getHeightInTiles(); j++){ //i,j for x,y of the map
+							int gid = formattedTiles[i][j];
+							if(gid != 0){ //don't draw if the gid is 0 (empty field)
+								int neededTileset = 0;
+								for(int k=0; k < fgidMap.length; k++){ //compute the corresponding tileset of the tile
+									if(fgidMap[k] <= gid){
+										neededTileset = k;
+									} else {
+										break;
+									}
+								}
+								Tileset tempTSet = this.getTileset(neededTileset);
+								int brd = (tempTSet.getImagewidth()/this.getTileWidth()); //compute linebreak (width in tiles)
+								int x = (gid-fgidMap[neededTileset])%brd*(this.getTileWidth()+tempTSet.getSpacing()) 
+											+ tempTSet.getMargin();
+								int y = (gid-fgidMap[neededTileset])/brd*(this.getTileHeight()+tempTSet.getSpacing())
+											+ tempTSet.getMargin();
+								System.out.println("firstgid: " +fgidMap[neededTileset] + "  x: " + x + "    y: " +y);
+								drawingBin.drawImage(tileset[neededTileset].getSubimage(x, y, this.getTileWidth(), this.getTileHeight()), 
+										i*this.getTileWidth(), j*this.getTileHeight(), null);
+							}
+						}
+					}
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Could not load Tileset");
