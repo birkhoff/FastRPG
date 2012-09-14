@@ -88,7 +88,7 @@ public class GamePanel extends JFrame implements Runnable {
         this.period = period;
         initFullScreen();
         readyForTermination();
-        island = new Map("maps/map1.tmx");
+        island = new Map("maps/TestMap1.tmx");
         gameStart();
     }
 

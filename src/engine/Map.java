@@ -141,10 +141,10 @@ public class Map {
 								}
 								Tileset tempTSet = this.getTileset(neededTileset);
 								int brd = (tempTSet.getImagewidth()/this.getTileWidth()); //compute linebreak (width in tiles)
-								int x = (gid-fgidMap[neededTileset])%brd*(this.getTileWidth()+tempTSet.getSpacing()) 
-											+ tempTSet.getMargin();
-								int y = (gid-fgidMap[neededTileset])/brd*(this.getTileHeight()+tempTSet.getSpacing())
-											+ tempTSet.getMargin();
+								int x = (gid-fgidMap[neededTileset])%brd*(this.getTileWidth()/*+tempTSet.getSpacing()*/); 
+											//+ tempTSet.getMargin();
+								int y = (gid-fgidMap[neededTileset])/brd*(this.getTileHeight()/*+tempTSet.getSpacing()*/);
+											//+ tempTSet.getMargin();
 								System.out.println("firstgid: " +fgidMap[neededTileset] + "  x: " + x + "    y: " +y);
 								drawingBin.drawImage(tileset[neededTileset].getSubimage(x, y, this.getTileWidth(), this.getTileHeight()), 
 										i*this.getTileWidth(), j*this.getTileHeight(), null);
