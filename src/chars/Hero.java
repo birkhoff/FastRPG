@@ -22,6 +22,7 @@ public class Hero {
 	private String name = "Insane";
 	private Look look = Look.S;
 	private int i = 0;
+	private int k = 0;
 	private float stepsize = 1f;
 	
 	public Hero() {
@@ -78,9 +79,13 @@ public class Hero {
 		this.position[1] = position;
 	}
 	public Image getImage() {
-		i=i+1;
-		i= i%7;
-		return toImage(hero[i]);
+		if(k>6){
+			i=i+1;
+			k = 0;
+		}
+		i= i%6;
+		k+=1;
+		return toImage(hero[i+1]);
 	}
 	public void setImage(Image image) {
 		this.image = (BufferedImage) image;
