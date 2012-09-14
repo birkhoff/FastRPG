@@ -1,9 +1,12 @@
 package engine;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -108,12 +111,20 @@ public class Map {
 			}
 			objectgroups[i] = new Objectgroup(ents, obj.getAttributeValue("name"));
 		}
-		
+		// Construction of Image to draw begins
+		drawnWorld = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+		Graphics2D drawingBin = drawnWorld.createGraphics();
+		try {
+			BufferedImage tileset = ImageIO.read(new File("maps/" + this.getTileset(0).getImagesource()));
+			drawingBin.drawImage(tileset, 0, 0, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Could not load Tileset");
+		}
 	}
 	
 	public BufferedImage getDrawnMap(){
-		return null;
-		//TODO
+		return drawnWorld;
 	}
 	
 	//*************** Map-Attribute-Getter *******************//
