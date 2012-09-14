@@ -27,11 +27,11 @@ public class Hero {
 	
 	public Hero() {
 		try {
-			image = ImageIO.read(new File("images/sprites/CompleteMoveSmall.png"));
+			image = ImageIO.read(new File("images/sprites/Hero.png"));
 			// The above line throws an checked IOException which must be caught.
 
-			final int width = 375;
-			final int height = 500;
+			final int width = 113;
+			final int height = 150;
 			final int rows = 14;
 			final int cols = 1;
 			hero = new BufferedImage[rows * cols];
