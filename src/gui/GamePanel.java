@@ -133,7 +133,6 @@ public class GamePanel extends JFrame implements Runnable {
 			case LOADLEVEL: 
 				break;
 			case RUN :
-				gScr.drawImage(island.getDrawnMap(),0,0,null);
 				drawBackground(gScr);
 				drawHero(gScr);	// get ya hero on the screen!
 				break;
@@ -327,13 +326,7 @@ public class GamePanel extends JFrame implements Runnable {
     }
     private void drawBackground(Graphics2D g) {
     	if (state == State.RUN) {    		
-//    		try {
-////    			BufferedImage konzeptBG;
-////    			konzeptBG = ImageIO.read(new File("images/konzeptBG.png"));
-////    			g.drawImage(konzeptBG, bgPosX, bgPosY, null);
-//    		} catch (IOException e) {
-//    			e.printStackTrace();
-//    		}
+    		g.drawImage(island.getDrawnMap(), bgPosX, bgPosY, null);
     		driftUp = false;
     		driftRight = false;
     		driftDown = false;
@@ -379,25 +372,53 @@ public class GamePanel extends JFrame implements Runnable {
 			boolean gone = false;		
 			
     		if (up && right) {
-				gone = true;
-				float dia = (float) (Math.sqrt(2*(step*step))/2);
-				hero.setPositionX(hero.getPositionX()+dia);
-				hero.setPositionY(hero.getPositionY()-dia);    				
+    			if (driftUp && driftRight) {}
+    			else if (driftUp) {
+    				hero.setPositionX(hero.getPositionX()+step);
+    			} else if (driftRight) {
+    				hero.setPositionY(hero.getPositionY()-step);
+    			}  else if (!driftUp && !driftRight) {
+    				float dia = (float) (Math.sqrt(2*(step*step))/2);
+    				hero.setPositionX(hero.getPositionX()+dia);
+    				hero.setPositionY(hero.getPositionY()-dia);    				    				
+    				gone = true;
+    			}
     		} else if (right && down) {
-    			float dia = (float) (Math.sqrt(2*(step*step))/2);
-    			hero.setPositionX(hero.getPositionX()+dia);
-    			hero.setPositionY(hero.getPositionY()+dia);
-    			gone = true;
+    			if (driftRight && driftDown) {}
+    			else if (driftRight) {
+    				hero.setPositionY(hero.getPositionY()+step);
+    			} else if (driftDown) {
+    				hero.setPositionX(hero.getPositionX()+step);
+    			} else {
+	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
+	    			hero.setPositionX(hero.getPositionX()+dia);
+	    			hero.setPositionY(hero.getPositionY()+dia);
+	    			gone = true;
+	    		}
     		} else if (down && left) {
-    			float dia = (float) (Math.sqrt(2*(step*step))/2);
-    			hero.setPositionX(hero.getPositionX()-dia);
-    			hero.setPositionY(hero.getPositionY()+dia);
-    			gone = true;
+    			if (driftDown && driftLeft) {}
+    			else if (driftDown) {
+    				hero.setPositionX(hero.getPositionX()-step);
+    			} else if (driftLeft) {
+    				hero.setPositionY(hero.getPositionY()+step);
+    			} else {
+	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
+	    			hero.setPositionX(hero.getPositionX()-dia);
+	    			hero.setPositionY(hero.getPositionY()+dia);
+	    			gone = true;
+    			}
     		} else if (left && up) {
-    			float dia = (float) (Math.sqrt(2*(step*step))/2);
-    			hero.setPositionX(hero.getPositionX()-dia);
-    			hero.setPositionY(hero.getPositionY()-dia);
-    			gone = true;
+    			if (driftLeft && driftUp) {}
+    			else if (driftLeft) {
+    				hero.setPositionY(hero.getPositionY()-step);
+    			} else if (driftUp) {
+    				hero.setPositionX(hero.getPositionX()-step);
+    			} else {
+    				float dia = (float) (Math.sqrt(2*(step*step))/2);
+    				hero.setPositionX(hero.getPositionX()-dia);
+    				hero.setPositionY(hero.getPositionY()-dia);
+    				gone = true;
+    			}
     		} 
     		else if (up && !gone && !driftUp)
     			hero.setPositionY(hero.getPositionY()-hero.getStepsize());
