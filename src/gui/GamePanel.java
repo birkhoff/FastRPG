@@ -24,9 +24,13 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import chars.*;
+import engine.*;
 
 enum State {
 	INTRO, MENU, LOADLEVEL, RUN, PAUSE
+}
+enum Direction {
+	N, NE, E, SE, S, SW, W, NW, NONE
 }
 
 public class GamePanel extends JFrame implements Runnable {
@@ -51,13 +55,15 @@ public class GamePanel extends JFrame implements Runnable {
     private int mWidth;			// Aufloesung des Monitors
     private int mHeight;		// Aufloesung des Monitors 
     private Graphics2D gScr;
+    private volatile boolean isPaused = false;
     private long period; // period between drawing in _nanosecs_
     private int pWidth, pHeight; // size of panel
-    private volatile boolean running = false; 
+    private volatile boolean running = false;
 	private static int positionInMainMenu = 0;
 	private State state = State.INTRO;
 
 	// Alles zur Bewegung
+	private Direction gotoDir = Direction.NONE;
 	private boolean up;
 	private boolean down;
 	private boolean left;
@@ -80,6 +86,7 @@ public class GamePanel extends JFrame implements Runnable {
 	
 	// Objects
 	private Hero hero;
+	private Map island;
 	
 	/**
 	 * Kontruktor
@@ -90,6 +97,7 @@ public class GamePanel extends JFrame implements Runnable {
         this.period = period;
         initFullScreen();
         readyForTermination();
+        island = new Map("maps/TestMap1.tmx");
         gameStart();
     }
 
@@ -125,6 +133,7 @@ public class GamePanel extends JFrame implements Runnable {
 			case LOADLEVEL: 
 				break;
 			case RUN :
+				gScr.drawImage(island.getDrawnMap(),0,0,null);
 				drawBackground(gScr);
 				drawHero(gScr);	// get ya hero on the screen!
 				break;
