@@ -1,5 +1,6 @@
 package engine;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -18,6 +19,7 @@ public class Map {
 	private Tileset[] tilesets;
 	private Layer[] layers;
 	private Objectgroup[] objectgroups;
+	private BufferedImage drawnWorld;
 	
 	private Document doc;
 	
@@ -109,7 +111,13 @@ public class Map {
 		
 	}
 	
+	public BufferedImage getDrawnMap(){
+		return null;
+		//TODO
+	}
+	
 	//*************** Map-Attribute-Getter *******************//
+	
 	public String getOrientation(){
 		return doc.getRootElement().getAttributeValue("orientation");
 	}
@@ -169,7 +177,7 @@ public class Map {
 		String[] rows = foo.split(",");
 		for(int i=0; i < getHeightInTiles(); i++){
 			for(int j=0; j < getWidthInTiles(); j++){
-				temp[j][i] = Integer.parseInt(rows[j+(i)*30]);
+				temp[j][i] = Integer.parseInt(rows[j+i*getWidthInTiles()]);
 			}
 		}
 		return temp;
