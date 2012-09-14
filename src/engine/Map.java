@@ -169,7 +169,7 @@ public class Map {
 		String[] rows = foo.split(",");
 		for(int i=0; i < getHeightInTiles(); i++){
 			for(int j=0; j < getWidthInTiles(); j++){
-				temp[j][i] = Integer.parseInt(rows[j+(i)*30]);
+				temp[j][i] = Integer.parseInt(rows[j+i*getWidthInTiles()]);
 			}
 		}
 		return temp;
