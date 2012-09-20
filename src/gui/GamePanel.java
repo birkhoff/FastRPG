@@ -71,7 +71,6 @@ public class GamePanel extends JFrame implements Runnable {
 	private int fps = 0;
 	
 	// Variablen zum Verschieben des Hintergrundes
-	private boolean drifting;
 	private boolean driftUp;
 	private boolean driftRight;
 	private boolean driftDown;
@@ -83,6 +82,8 @@ public class GamePanel extends JFrame implements Runnable {
 	private Hero hero;
 	private Map island;
 	
+	// Dont know
+	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
 	/**
 	 * Kontruktor
 	 */
@@ -137,6 +138,7 @@ public class GamePanel extends JFrame implements Runnable {
     	if (debugMode) {
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
+	    	gScr.drawString("Background-Position x = "+bgPosX+", y = "+bgPosY, 20, 60);
     	}
     }
     
@@ -200,11 +202,11 @@ public class GamePanel extends JFrame implements Runnable {
         gameStartTime = System.nanoTime();
         beforeTime = gameStartTime;
         running = true;
-        hero = new Hero();	// create insane hero!
-        
+        hero = new Hero(mWidth/2, mHeight/2);	// create insane hero!
         while (running) {
             gameUpdate();
             screenUpdate();
+            tolerance = hero.getStepsize();
             afterTime = System.nanoTime();
             timeDiff = afterTime - beforeTime;
             sleepTime = period - timeDiff - overSleepTime;
@@ -326,35 +328,40 @@ public class GamePanel extends JFrame implements Runnable {
     		driftLeft = false;
     	}
     }
+    /******************** /Draw Methoden/ *********************/
     /**
      * Soll den Untergrund verschieben, wenn der Held an die Kante
      * des Bildschirms kommt.
      */
     private void calcDrift() {
     	if (state == State.RUN) {
-	    	float drift = 0.2f;		// Setze 20% Kante zum scrollen
-	    	// Oberer und unterer Rand
-	    	if (hero.getPositionY() < mHeight*drift && up) {
-	    		drifting = true;
-	    		driftUp = true;
-	    		bgPosY += (int) hero.getStepsize();
-	    	} else if (hero.getPositionY() >= mHeight - (mHeight*drift) && down) {
-	    		drifting = true;
-	    		driftDown = true;
-	    		bgPosY += (int) ((-1)*hero.getStepsize());
-	    	} 
-	    	if (hero.getPositionX() < (mWidth*drift) && left) {
-	    		drifting = true;
-	    		driftLeft = true;
-	    		bgPosX += (int) hero.getStepsize();
-	    	} else if (hero.getPositionX() >= mWidth - (mWidth*drift) && right) {
-	    		drifting = true;
-	    		driftRight = true;
-	    		bgPosX += (int) ((-1)*hero.getStepsize());
-	    	}
+    		float drift = 0.1f;		// Setze 20% Kante zum scrollen
+    		float[] center = Lib.getCenterHero(hero);
+    		// Oberer und unterer Rand
+    		if (hero.getPositionY() < mHeight*drift - center[1] && up) {
+    			if (bgPosY+tolerance < 0) {
+    				driftUp = true;
+    				bgPosY += (int) hero.getStepsize();	
+    			}
+    		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down) {
+    			if (bgPosY-tolerance >= (-1)*(island.getHeight()-mHeight)) {
+    				driftDown = true;
+    				bgPosY += (int) ((-1)*hero.getStepsize());
+    			}
+    		} 
+    		if (hero.getPositionX() < (mWidth*drift) - center[0] && left) {
+    			if (bgPosX+tolerance < 0) {
+    				driftLeft = true;
+    				bgPosX += (int) hero.getStepsize();
+    			}
+    		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right) {
+    			if (bgPosX-tolerance >= (-1)*(island.getWidth()-mWidth)) {
+    				driftRight = true;
+    				bgPosX += (int) ((-1)*hero.getStepsize());
+    			}
+    		}
     	}
     }
-    /******************** /Draw Methoden/ *********************/
     
     /**
      * Bewege den Helden!
@@ -362,18 +369,21 @@ public class GamePanel extends JFrame implements Runnable {
     private void moveHero() {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
+			float[] center = Lib.getCenterHero(hero);
 			boolean gone = false;		
-			
+
     		if (up && right) {
     			if (driftUp && driftRight) {}
-    			else if (driftUp) {
+    			else if (driftUp && hero.getPositionX() < mWidth) {
     				hero.setPositionX(hero.getPositionX()+step);
-    			} else if (driftRight) {
+    			} else if (driftRight && hero.getPositionY() < 0) {
     				hero.setPositionY(hero.getPositionY()-step);
     			}  else if (!driftUp && !driftRight) {
     				float dia = (float) (Math.sqrt(2*(step*step))/2);
-    				hero.setPositionX(hero.getPositionX()+dia);
-    				hero.setPositionY(hero.getPositionY()-dia);    				    				
+    				if (hero.getPositionX()-center[0] <= mWidth) 
+    					hero.setPositionX(hero.getPositionX()+dia);
+    				if (hero.getPositionY()+center[1] > 0)
+    					hero.setPositionY(hero.getPositionY()-dia);    				    				
     				gone = true;
     			}
     		} else if (right && down) {
@@ -413,13 +423,13 @@ public class GamePanel extends JFrame implements Runnable {
     				gone = true;
     			}
     		} 
-    		else if (up && !gone && !driftUp)
+    		else if (up && !gone && !driftUp && hero.getPositionY() > 0)
     			hero.setPositionY(hero.getPositionY()-hero.getStepsize());
-    		else if (right && !gone && !driftRight)
+    		else if (right && !gone && !driftRight && hero.getPositionX() < mWidth-hero.getWidth())
     			hero.setPositionX(hero.getPositionX()+hero.getStepsize());
-    		else if (down && !gone && !driftDown)
+    		else if (down && !gone && !driftDown && hero.getPositionY() < mHeight-hero.getHeight())
     			hero.setPositionY(hero.getPositionY()+hero.getStepsize());
-    		else if (left && !gone && !driftLeft)
+    		else if (left && !gone && !driftLeft && hero.getPositionX() > 0)
     			hero.setPositionX(hero.getPositionX()-hero.getStepsize());
     	}
     }
