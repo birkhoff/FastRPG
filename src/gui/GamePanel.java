@@ -17,11 +17,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import chars.*;
 import engine.*;
@@ -55,15 +51,14 @@ public class GamePanel extends JFrame implements Runnable {
     private int mWidth;			// Aufloesung des Monitors
     private int mHeight;		// Aufloesung des Monitors 
     private Graphics2D gScr;
-    private volatile boolean isPaused = false;
     private long period; // period between drawing in _nanosecs_
     private int pWidth, pHeight; // size of panel
     private volatile boolean running = false;
 	private static int positionInMainMenu = 0;
 	private State state = State.INTRO;
+	private boolean debugMode = true;
 
 	// Alles zur Bewegung
-	private Direction gotoDir = Direction.NONE;
 	private boolean up;
 	private boolean down;
 	private boolean left;
@@ -139,12 +134,10 @@ public class GamePanel extends JFrame implements Runnable {
 			case PAUSE :
 				break;
     	}
-    	gScr.drawString("FPS: "+fps, 20, 20);
-    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY()+", Schrittgroesse: "+hero.getStepsize(), 20, 40);
-    	gScr.drawString("Up: "+up, 20, 60);
-    	gScr.drawString("Right: "+right, 20, 80);
-    	gScr.drawString("Down: "+down, 20, 100);
-    	gScr.drawString("Left: "+left, 20, 120);
+    	if (debugMode) {
+	    	gScr.drawString("FPS: "+fps, 20, 20);
+	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
+    	}
     }
     
     /**
@@ -435,6 +428,11 @@ public class GamePanel extends JFrame implements Runnable {
      */
     class GameListener implements KeyListener {
     	public void keyPressed(KeyEvent e) {
+    		if (debugMode) {
+    			if (e.getKeyCode() == KeyEvent.VK_SPACE)
+    				debugMode = false;
+   			} else if (e.getKeyCode() == KeyEvent.VK_SPACE)
+   				debugMode = true;
     		if (state == State.RUN) {
 	    		switch (e.getKeyCode()) {
 	    			case 37: left = true; break;

@@ -23,17 +23,17 @@ public class Hero {
 	private Look look = Look.S;
 	private int i = 0;
 	private int k = 0;
-	private float stepsize = 1f;
+	private float stepsize = 3f;
 	
 	public Hero() {
 		try {
 			image = ImageIO.read(new File("images/sprites/Hero.png"));
 			// The above line throws an checked IOException which must be caught.
-
 			final int width = 113;
 			final int height = 150;
 			final int rows = 14;
 			final int cols = 1;
+			
 			hero = new BufferedImage[rows * cols];
 
 			for (int i = 0; i < rows; i++)
@@ -79,7 +79,7 @@ public class Hero {
 		this.position[1] = position;
 	}
 	public Image getImage() {
-		if(k>3){
+		if(k>13){
 			i=i+1;
 			k = 0;
 		}
@@ -102,11 +102,9 @@ public class Hero {
 	public void setLook(Look look) {
 		this.look = look;
 	}
-
 	public float getStepsize() {
 		return stepsize;
 	}
-
 	public void setStepsize(float stepsize) {
 		this.stepsize = stepsize;
 	}
