@@ -1,4 +1,5 @@
 package engine;
+import Interfaces.*;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -17,12 +18,13 @@ import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.XMLOutputter;
 
 // Has the ability to read out *TMX-Files and build a Map out of them
-public class Map {
+public class Map implements IGameObject{
 	
 	private Document MapXML;
 	private Tileset[] tilesets;
 	private Layer[] layers;
 	private Objectgroup[] objectgroups;
+	private boolean[][] collision;
 	private BufferedImage drawnWorld;
 	
 	private Document doc;
@@ -152,6 +154,34 @@ public class Map {
 							}
 						}
 					}
+				} else {
+					//compute Collision
+					collision = new boolean[this.getWidth()][this.getHeight()];
+					//Speicherplatzverschwndung - Fix wenn Geschwindigkeit needed
+					int[][] formattedTiles = this.getFormattedTiles(l);
+					for(int i=0; i < this.getWidthInTiles(); i++){
+						for(int j=0; j < this.getHeightInTiles(); j++){ //i,j for x,y of the map
+							int gid = formattedTiles[i][j];
+							if(gid != 0){ //don't draw if the gid is 0 (empty field)
+								int neededTileset = 0;
+								for(int k=0; k < fgidMap.length; k++){ //compute the corresponding tileset of the tile
+									if(fgidMap[k] <= gid){
+										neededTileset = k;
+									} else {
+										break;
+									}
+								}
+								Tileset tempTSet = this.getTileset(neededTileset);
+								int brd = (tempTSet.getImagewidth() - tempTSet.getMargin()*2 + tempTSet.getSpacing()) / 
+										(this.getTileWidth() + tempTSet.getSpacing()); //compute linebreak (width in tiles)
+								int x = (gid-fgidMap[neededTileset])%brd*(this.getTileWidth()+tempTSet.getSpacing()) 
+											+ tempTSet.getMargin();
+								int y = (gid-fgidMap[neededTileset])/brd*(this.getTileHeight()+tempTSet.getSpacing())
+											+ tempTSet.getMargin();
+								collision[x][y] = true;
+							}
+						}
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -237,6 +267,16 @@ public class Map {
 	
 	public Objectgroup getObjectgroup(int i){
 		return objectgroups[i];
+	}
+
+	@Override
+	public boolean isSolid(int x, int y) {
+		int newx = (x/this.getTileWidth())*this.getTileWidth();
+		int newy = (y/this.getTileHeight())*this.getTileHeight();
+		if(collision[newx][newy]){
+			return true;
+		}
+		return false;
 	}
 	
 	//*************** End of Getter **************************//
