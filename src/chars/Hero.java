@@ -33,13 +33,13 @@ public class Hero {
 	
 	public Hero(float x, float y) {
 		try {
-			image = ImageIO.read(new File("images/sprites/Hero.png"));
+			image = ImageIO.read(new File("images/sprites/HeroSlash.png"));
 			// The above line throws an checked IOException which must be caught.
 			setWidth(113);
 			setHeight(150);
-			setRows(14);
+			setRows(20);
 			setCols(1);
-			
+
 			hero = new BufferedImage[getRows() * getCols()];
 
 			for (int i = 0; i < getRows(); i++)
@@ -85,13 +85,13 @@ public class Hero {
 		this.position[1] = position;
 	}
 	public Image getImage() {
-		if(k>13){
+		if(k>1){
 			i=i+1;
 			k = 0;
 		}
-		i= i%6;
+		i= i%20;
 		k+=1;
-		return toImage(hero[i+1]);
+		return toImage(hero[i]);
 	}
 	public void setImage(Image image) {
 		this.image = (BufferedImage) image;
