@@ -23,28 +23,34 @@ public class Hero {
 	private Look look = Look.S;
 	private int i = 0;
 	private int k = 0;
-	private float stepsize = 3f;
+	private float stepsize = 30f;
 	
-	public Hero() {
+	// Properties of Width
+	private int width;
+	private int height;
+	private int rows;
+	private int cols;
+	
+	public Hero(float x, float y) {
 		try {
 			image = ImageIO.read(new File("images/sprites/Hero.png"));
 			// The above line throws an checked IOException which must be caught.
-			final int width = 113;
-			final int height = 150;
-			final int rows = 14;
-			final int cols = 1;
+			setWidth(113);
+			setHeight(150);
+			setRows(14);
+			setCols(1);
 			
-			hero = new BufferedImage[rows * cols];
+			hero = new BufferedImage[getRows() * getCols()];
 
-			for (int i = 0; i < rows; i++)
+			for (int i = 0; i < getRows(); i++)
 			{
-			    for (int j = 0; j < cols; j++)
+			    for (int j = 0; j < getCols(); j++)
 			    {
-			        hero[(i * cols) + j] = image.getSubimage(
-			            j * width,
-			            i * height,
-			            width,
-			            height
+			        hero[(i * getCols()) + j] = image.getSubimage(
+			            j * getWidth(),
+			            i * getHeight(),
+			            getWidth(),
+			            getHeight()
 			        );
 			    }
 			}
@@ -52,14 +58,14 @@ public class Hero {
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
 		position = new float[2];
-		position[0] = 100;
-		position[1] = 100;
+		position[0] = x;
+		position[1] = y;
 	}
 	
 	public Image toImage(BufferedImage bufferedImage) {
 	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
 	}
-/******************* Getter und Setter ******************/
+	/******************* Getter und Setter ******************/
 	public float getPositionX() {
 		return position[0];
 	}
@@ -107,5 +113,29 @@ public class Hero {
 	}
 	public void setStepsize(float stepsize) {
 		this.stepsize = stepsize;
+	}
+	public int getWidth() {
+		return width;
+	}
+	public void setWidth(int width) {
+		this.width = width;
+	}
+	public int getHeight() {
+		return height;
+	}
+	public void setHeight(int height) {
+		this.height = height;
+	}
+	public int getRows() {
+		return rows;
+	}
+	public void setRows(int rows) {
+		this.rows = rows;
+	}
+	public int getCols() {
+		return cols;
+	}
+	public void setCols(int cols) {
+		this.cols = cols;
 	}
 }
