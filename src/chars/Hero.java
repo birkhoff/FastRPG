@@ -29,11 +29,11 @@ public class Hero {
 		try {
 			image = ImageIO.read(new File("images/sprites/Hero.png"));
 			// The above line throws an checked IOException which must be caught.
-
 			final int width = 113;
 			final int height = 150;
 			final int rows = 14;
 			final int cols = 1;
+			
 			hero = new BufferedImage[rows * cols];
 
 			for (int i = 0; i < rows; i++)
@@ -102,11 +102,9 @@ public class Hero {
 	public void setLook(Look look) {
 		this.look = look;
 	}
-
 	public float getStepsize() {
 		return stepsize;
 	}
-
 	public void setStepsize(float stepsize) {
 		this.stepsize = stepsize;
 	}
