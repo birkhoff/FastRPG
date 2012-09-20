@@ -23,7 +23,7 @@ public class Hero {
 	private Look look = Look.S;
 	private int i = 0;
 	private int k = 0;
-	private float stepsize = 1f;
+	private float stepsize = 3f;
 	
 	public Hero() {
 		try {
@@ -79,7 +79,7 @@ public class Hero {
 		this.position[1] = position;
 	}
 	public Image getImage() {
-		if(k>3){
+		if(k>13){
 			i=i+1;
 			k = 0;
 		}
