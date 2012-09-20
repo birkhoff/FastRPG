@@ -369,57 +369,62 @@ public class GamePanel extends JFrame implements Runnable {
     private void moveHero() {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
-			float[] center = Lib.getCenterHero(hero);
 			boolean gone = false;		
 
     		if (up && right) {
     			if (driftUp && driftRight) {}
-    			else if (driftUp && hero.getPositionX() < mWidth) {
+    			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth()) {
     				hero.setPositionX(hero.getPositionX()+step);
     			} else if (driftRight && hero.getPositionY() < 0) {
     				hero.setPositionY(hero.getPositionY()-step);
     			}  else if (!driftUp && !driftRight) {
     				float dia = (float) (Math.sqrt(2*(step*step))/2);
-    				if (hero.getPositionX()-center[0] <= mWidth) 
+    				if (hero.getPositionX() <= mWidth-hero.getWidth()) 
     					hero.setPositionX(hero.getPositionX()+dia);
-    				if (hero.getPositionY()+center[1] > 0)
+    				if (hero.getPositionY() > 0)
     					hero.setPositionY(hero.getPositionY()-dia);    				    				
     				gone = true;
     			}
     		} else if (right && down) {
     			if (driftRight && driftDown) {}
-    			else if (driftRight) {
+    			else if (driftRight && hero.getPositionY() < mHeight-hero.getHeight()) {
     				hero.setPositionY(hero.getPositionY()+step);
-    			} else if (driftDown) {
+    			} else if (driftDown && hero.getPositionX() < mWidth-hero.getWidth()) {
     				hero.setPositionX(hero.getPositionX()+step);
     			} else {
 	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
-	    			hero.setPositionX(hero.getPositionX()+dia);
-	    			hero.setPositionY(hero.getPositionY()+dia);
+	    			if (hero.getPositionX() < mWidth-hero.getWidth()) 
+	    				hero.setPositionX(hero.getPositionX()+dia);
+	    			if (hero.getPositionY() < mHeight-hero.getHeight())
+	    				hero.setPositionY(hero.getPositionY()+dia);
 	    			gone = true;
 	    		}
     		} else if (down && left) {
     			if (driftDown && driftLeft) {}
-    			else if (driftDown) {
+    			else if (driftDown && hero.getPositionX() > 0) {
     				hero.setPositionX(hero.getPositionX()-step);
-    			} else if (driftLeft) {
+    			} else if (driftLeft && hero.getPositionY() < mHeight-hero.getHeight() ) {
     				hero.setPositionY(hero.getPositionY()+step);
     			} else {
 	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
-	    			hero.setPositionX(hero.getPositionX()-dia);
-	    			hero.setPositionY(hero.getPositionY()+dia);
+	    			if (hero.getPositionX() > 0)
+	    				hero.setPositionX(hero.getPositionX()-dia);
+	    			if (hero.getPositionY() < mHeight-hero.getHeight())
+	    				hero.setPositionY(hero.getPositionY()+dia);
 	    			gone = true;
     			}
     		} else if (left && up) {
     			if (driftLeft && driftUp) {}
-    			else if (driftLeft) {
+    			else if (driftLeft && hero.getPositionY() > 0) {
     				hero.setPositionY(hero.getPositionY()-step);
-    			} else if (driftUp) {
+    			} else if (driftUp && hero.getPositionX() > 0) {
     				hero.setPositionX(hero.getPositionX()-step);
     			} else {
     				float dia = (float) (Math.sqrt(2*(step*step))/2);
-    				hero.setPositionX(hero.getPositionX()-dia);
-    				hero.setPositionY(hero.getPositionY()-dia);
+    				if (hero.getPositionX() > 0)
+    					hero.setPositionX(hero.getPositionX()-dia);
+    				if (hero.getPositionY() > 0)
+    					hero.setPositionY(hero.getPositionY()-dia);
     				gone = true;
     			}
     		} 
