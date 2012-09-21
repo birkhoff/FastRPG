@@ -408,7 +408,7 @@ public class GamePanel extends JFrame implements Runnable {
     					!island.isSolid((int)(hero.getPositionX()+step+hero.getWidth()*0.8-MapPosX),
     									(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()+step);
-    			} else if (driftRight && hero.getPositionY() < 0 &&
+    			} else if (driftRight && hero.getPositionY() > 0 &&
     					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
 										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY)) &&
 						!island.isSolid((int)(hero.getPositionX()-MapPosX),
@@ -430,48 +430,81 @@ public class GamePanel extends JFrame implements Runnable {
     			}
     		} else if (right && down) {
     			if (driftRight && driftDown) {}
-    			else if (driftRight && hero.getPositionY() < mHeight-hero.getHeight()) {
-    				if (down)
+    			else if (driftRight && hero.getPositionY() < mHeight-hero.getHeight() &&
+    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
+										(int)(hero.getPositionY()+step+hero.getHeight()*0.85-MapPosY)) &&
+						!island.isSolid((int)(hero.getPositionX()-MapPosX),
+										(int)(hero.getPositionY()+step+hero.getHeight()*0.85-MapPosY))) {
     					hero.setPositionY(hero.getPositionY()+step);
-    				else if (up) 
-    					hero.setPositionY(hero.getPositionY()-step);
-    			} else if (driftDown && hero.getPositionX() < mWidth-hero.getWidth()) {
+    			} else if (driftDown && hero.getPositionX() < mWidth-hero.getWidth() &&
+    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8+step-MapPosX),
+										(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()+step);
     			} else {
 	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
-	    			if (hero.getPositionX() < mWidth-hero.getWidth()) 
+	    			if (hero.getPositionX() < mWidth-hero.getWidth() &&
+	    					!island.isSolid((int)(hero.getPositionX()+dia+hero.getWidth()*0.8-MapPosX),
+											(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) 
 	    				hero.setPositionX(hero.getPositionX()+dia);
-	    			if (hero.getPositionY() < mHeight-hero.getHeight())
+	    			if (hero.getPositionY() < mHeight-hero.getHeight() &&
+	    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
+											(int)(hero.getPositionY()+dia+hero.getHeight()*0.85-MapPosY)) &&
+							!island.isSolid((int)(hero.getPositionX()-MapPosX),
+											(int)(hero.getPositionY()+dia+hero.getHeight()*0.85-MapPosY)))
 	    				hero.setPositionY(hero.getPositionY()+dia);
 	    			gone = true;
 	    		}
     		} else if (down && left) {
     			if (driftDown && driftLeft) {}
-    			else if (driftDown && hero.getPositionX() > 0) {
+    			else if (driftDown && hero.getPositionX() > 0 &&
+    					!island.isSolid((int)(hero.getPositionX()-step-MapPosX),
+										(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()-step);
     				gone = true;
-    			} else if (driftLeft && hero.getPositionY() < mHeight-hero.getHeight() ) {
+    			} else if (driftLeft && hero.getPositionY() < mHeight-hero.getHeight() &&
+    					!island.isSolid((int)(hero.getPositionX()-MapPosX),
+										(int)(hero.getPositionY()+step+hero.getHeight()*0.85-MapPosY)) &&
+						!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
+										(int)(hero.getPositionY()+step+hero.getHeight()*0.85-MapPosY))) {
     				hero.setPositionY(hero.getPositionY()+step);
     				gone = true;
     			} else {
 	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
-	    			if (hero.getPositionX() > 0)
+	    			if (hero.getPositionX() > 0 &&
+	    					!island.isSolid((int)(hero.getPositionX()-dia-MapPosX),
+											(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY)))
 	    				hero.setPositionX(hero.getPositionX()-dia);
-	    			if (hero.getPositionY() < mHeight-hero.getHeight())
+	    			if (hero.getPositionY() < mHeight-hero.getHeight() &&
+	    					!island.isSolid((int)(hero.getPositionX()-MapPosX),
+											(int)(hero.getPositionY()+dia+hero.getHeight()*0.85-MapPosY)) &&
+							!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
+											(int)(hero.getPositionY()+dia+hero.getHeight()*0.85-MapPosY)))
 	    				hero.setPositionY(hero.getPositionY()+dia);
 	    			gone = true;
     			}
     		} else if (left && up) {
     			if (driftLeft && driftUp) {}
-    			else if (driftLeft && hero.getPositionY() > 0) {
+    			else if (driftLeft && hero.getPositionY() > 0 &&
+    						!island.isSolid((int)(hero.getPositionX()-MapPosX),
+    										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY)) &&
+    						!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
+    										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY))) {
     				hero.setPositionY(hero.getPositionY()-step);
-    			} else if (driftUp && hero.getPositionX() > 0) {
+    			} else if (driftUp && hero.getPositionX() > 0 &&
+    						!island.isSolid((int)(hero.getPositionX()-step-MapPosX),
+											(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()-step);
     			} else {
     				float dia = (float) (Math.sqrt(2*(step*step))/2);
-    				if (hero.getPositionX() > 0)
+    				if (hero.getPositionX() > 0 &&
+    						!island.isSolid((int)(hero.getPositionX()-dia-MapPosX),
+											(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY)))
     					hero.setPositionX(hero.getPositionX()-dia);
-    				if (hero.getPositionY() > 0)
+    				if (hero.getPositionY() > 0 &&
+    						!island.isSolid((int)(hero.getPositionX()-MapPosX),
+											(int)(hero.getPositionY()-dia+hero.getHeight()*0.85-MapPosY)) &&
+							!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
+											(int)(hero.getPositionY()-dia+hero.getHeight()*0.85-MapPosY)))
     					hero.setPositionY(hero.getPositionY()-dia);
     				gone = true;
     			}
