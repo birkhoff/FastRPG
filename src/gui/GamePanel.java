@@ -340,23 +340,35 @@ public class GamePanel extends JFrame implements Runnable {
     		float drift = 0.2f;		// Setze 20% Kante zum scrollen
     		float[] center = Lib.getCenter(hero);
     		// Oberer und unterer Rand
-    		if (hero.getPositionY() < mHeight*drift - center[1] && up) {
+    		if (hero.getPositionY() < mHeight*drift - center[1] && up &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8-hero.getStepsize()-MapPosY)) &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8-hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()+tolerance < 0) {
     				driftUp = true;
     				setMapPosY(getMapPosY() + (int) hero.getStepsize());	
     			}
-    		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down) {
+    		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8+hero.getStepsize()-MapPosY)) &&
+								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),
+												(int)(hero.getPositionY()+hero.getHeight()*0.8+hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()-tolerance >= (-1)*(island.getHeight()-mHeight)) {
     				driftDown = true;
     				setMapPosY(getMapPosY() + (int) ((-1)*hero.getStepsize()));
     			}
     		} 
-    		if (hero.getPositionX() < (mWidth*drift) - center[0] && left) {
+    		if (hero.getPositionX() < (mWidth*drift) - center[0] && left &&
+    							!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8-MapPosY))) {
     			if (getMapPosX()+tolerance < 0) {
     				driftLeft = true;
     				setMapPosX(getMapPosX() + (int) hero.getStepsize());
     			}
-    		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right) {
+    		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right &&
+    							!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()+hero.getWidth()*0.8-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8-MapPosY))) {
     			if (getMapPosX()-tolerance >= (-1)*(island.getWidth()-mWidth)) {
     				driftRight = true;
     				setMapPosX(getMapPosX() + (int) ((-1)*hero.getStepsize()));
