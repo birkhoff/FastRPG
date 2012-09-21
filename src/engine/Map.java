@@ -257,6 +257,16 @@ public class Map implements IGameObject{
 	public Objectgroup getObjectgroup(int i){
 		return objectgroups[i];
 	}
+	
+	public Objectgroup getObjectGroup(String name){
+		// returns Objectgroup with name name, else returning null if not existing
+		for(int i=0; i< objectgroups.length; i++){
+			if(objectgroups[i].getName().equals(name)){
+				return objectgroups[i];
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public boolean isSolid(int x, int y) {
