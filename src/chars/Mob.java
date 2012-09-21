@@ -25,6 +25,7 @@ public class Mob implements IGameChars {
 	private float stepsize = 3f;
 	
 	public Mob(String name, float x, float y) {
+		this.name = name;
 		try {
 			if (name.equals("Gumba"))
 				setImage(ImageIO.read(new File("images/sprites/"+name+".png")));
