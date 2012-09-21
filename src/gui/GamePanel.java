@@ -57,6 +57,7 @@ public class GamePanel extends JFrame implements Runnable {
 	private static int positionInMainMenu = 0;
 	private State state = State.INTRO;
 	private boolean debugMode = true;
+	private boolean turboMode = false;
 
 	// Alles zur Bewegung
 	private boolean up;
@@ -138,7 +139,7 @@ public class GamePanel extends JFrame implements Runnable {
     	if (debugMode) {
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
-	    	gScr.drawString("Background-Position x = "+bgPosX+", y = "+bgPosY, 20, 60);
+	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 60);
     	}
     }
     
@@ -335,7 +336,7 @@ public class GamePanel extends JFrame implements Runnable {
      */
     private void calcDrift() {
     	if (state == State.RUN) {
-    		float drift = 0.1f;		// Setze 20% Kante zum scrollen
+    		float drift = 0.2f;		// Setze 20% Kante zum scrollen
     		float[] center = Lib.getCenterHero(hero);
     		// Oberer und unterer Rand
     		if (hero.getPositionY() < mHeight*drift - center[1] && up) {
@@ -448,6 +449,16 @@ public class GamePanel extends JFrame implements Runnable {
     				debugMode = false;
    			} else if (e.getKeyCode() == KeyEvent.VK_SPACE)
    				debugMode = true;
+    		if (turboMode) {
+    			if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+    				turboMode = false;
+    				hero.setStepsize(hero.getStepsize()/10);
+    			}
+    		} else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+    			turboMode = true;
+    			hero.setStepsize(hero.getStepsize()*10);
+    		}
+    		
     		if (state == State.RUN) {
 	    		switch (e.getKeyCode()) {
 	    			case 37: left = true; break;
