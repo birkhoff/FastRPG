@@ -55,6 +55,7 @@ public class Hero implements IGameChars {
 			maxSlash = 20;							// number of maximal slash pictures
 
 			hero = new BufferedImage[getRows() * getCols()];
+			sword = new SimpleSword();
 
 			for (int i = 0; i < getRows(); i++)
 			{
@@ -74,7 +75,9 @@ public class Hero implements IGameChars {
 		position = new float[2];
 		position[0] = x;
 		position[1] = y;
+		
 	}
+	
 	
 	public void slash(){
 		setSlash(true);
@@ -116,6 +119,15 @@ public class Hero implements IGameChars {
 	public void setPositionY(float position) {
 		this.position[1] = position;
 	}
+	
+	public void updateStrike(int spriteCount){
+		
+		sword.setAlpha(sword.getAlpha()+20);
+		sword.setImage( sword.rotateImage(sword.getImage(), sword.getAlpha()) );
+		sword.setX(this.getPositionX());
+		sword.setY(this.getPositionY());
+	}
+	
 	public Image getImage() {
 		
 		// GET THE SLASHING SPRITES
@@ -126,12 +138,16 @@ public class Hero implements IGameChars {
 			}
 			i= i%getNumberOfSlashSprites();
 			k+=1;
+			
+			//Ending Slash Sequence
 			if( i >= getNumberOfSlashSprites()-1){
 				this.setSlash(false);
 				this.setStepsize(getStepsize()*2);
 				this.resetStrike();
 				k = 0;
 				i = 0;
+				this.sword.setAlpha(0);
+				this.sword.setImageBack();
 			}
 			return toImage(hero[i+15]);
 		}
@@ -247,5 +263,13 @@ public class Hero implements IGameChars {
 
 	public boolean isStanding() {
 		return standing;
+	}
+
+	public void setSword(SimpleSword sword) {
+		this.sword = sword;
+	}
+
+	public SimpleSword getSword() {
+		return sword;
 	}
 }

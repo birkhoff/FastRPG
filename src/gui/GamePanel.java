@@ -142,7 +142,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
 	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
-	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left+" slash: "+slash+" stepsize: "+hero.getStepsize(), 20, 80);
+	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left+" slash: "+slash+" stepsize: "+hero.getStepsize()+" Sword-X: "+hero.getSword().getX()+" Sword-Y: "+hero.getSword().getY(), 20, 80);
 	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 100);
     	}
     }
@@ -321,6 +321,10 @@ public class GamePanel extends JFrame implements Runnable {
     private void drawHero(Graphics2D g) {
     	if (state == State.RUN) {
     		g.drawImage(hero.getImage(), (int)hero.getPositionX(), (int)hero.getPositionY(), null);
+    		if(slash ){
+    			hero.updateStrike(1);
+    			g.drawImage(hero.getSword().getImage(), (int)hero.getSword().getX(), (int)hero.getSword().getY(), null);
+    		}
     	}
     }
     private void drawBackground(Graphics2D g) {

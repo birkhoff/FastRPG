@@ -1,5 +1,8 @@
 package weapons;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -102,11 +105,19 @@ public abstract class Sword {
 
 
 	public BufferedImage getImage() {
+		
 		return image;
 	}
 	
 	
 	
-	
+	public BufferedImage rotateImage(BufferedImage rotIm, double degrees) {
+		
+		AffineTransform transform = new AffineTransform();
+	    transform.rotate(Math.toRadians(-degrees), rotIm.getWidth()/2, rotIm.getHeight()/2);
+	    AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
+	    BufferedImage returnIm = op.filter(rotIm, null);
+        return returnIm;
+    }
 	
 }
