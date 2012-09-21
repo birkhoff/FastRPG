@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.DisplayMode;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -17,6 +18,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.util.LinkedList;
 
 import javax.swing.JFrame;
 import chars.*;
@@ -134,6 +137,7 @@ public class GamePanel extends JFrame implements Runnable {
 			case RUN :
 				drawBackground(gScr);
 				drawHero(gScr);	// get ya hero on the screen!
+//				drawMobs(gScr);
 				break;
 			case PAUSE :
 				break;
@@ -165,6 +169,11 @@ public class GamePanel extends JFrame implements Runnable {
         	countFPS();
         	calcDrift();
         	moveHero();
+        	LinkedList<Mob> Mobs = AssetCreator.getMobs();
+        	for (int i = 0; i < Mobs.size(); i++) {
+    			Mob mob = Mobs.get(i);
+    			mob.walk();
+    		}
         }
     } 
 
@@ -208,10 +217,12 @@ public class GamePanel extends JFrame implements Runnable {
         beforeTime = gameStartTime;
         running = true;
         hero = new Hero(mWidth/2, mHeight/2);	// create insane hero!
+        AssetCreator.getEnemiesFromMap(island);
         while (running) {
             gameUpdate();
             screenUpdate();
             tolerance = hero.getStepsize();
+            
             afterTime = System.nanoTime();
             timeDiff = afterTime - beforeTime;
             sleepTime = period - timeDiff - overSleepTime;
@@ -328,12 +339,26 @@ public class GamePanel extends JFrame implements Runnable {
     	}
     }
     private void drawBackground(Graphics2D g) {
-    	if (state == State.RUN) {    		
+    	if (state == State.RUN) {
+    		// EXPERIMENTAL
+//    		BufferedImage foo = island.getDrawnMap();
+//    		drawMobs(foo.getGraphics());
+//    		g.drawImage(foo, getMapPosX(), getMapPosY(), null);
     		g.drawImage(island.getDrawnMap(), getMapPosX(), getMapPosY(), null);
+    	
     		driftUp = false;
     		driftRight = false;
     		driftDown = false;
     		driftLeft = false;
+    	}
+    }
+    private void drawMobs(Graphics g) {
+    	if (state == State.RUN) {
+    		LinkedList<Mob> Mobs = AssetCreator.getMobs();
+    		for (int i = 0; i < Mobs.size(); i++) {
+    			Mob mob = Mobs.get(i);
+    			g.drawImage(mob.getImage(), (int)mob.getPositionX(), (int)mob.getPositionY(), null);
+    		}
     	}
     }
     /******************** /Draw Methoden/ *********************/
