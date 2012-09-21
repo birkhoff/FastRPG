@@ -1,5 +1,6 @@
 package engine;
-import Interfaces.*;
+
+import interfaces.*;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

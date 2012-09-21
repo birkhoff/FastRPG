@@ -338,7 +338,7 @@ public class GamePanel extends JFrame implements Runnable {
     private void calcDrift() {
     	if (state == State.RUN) {
     		float drift = 0.2f;		// Setze 20% Kante zum scrollen
-    		float[] center = Lib.getCenterHero(hero);
+    		float[] center = Lib.getCenter(hero);
     		// Oberer und unterer Rand
     		if (hero.getPositionY() < mHeight*drift - center[1] && up) {
     			if (getMapPosY()+tolerance < 0) {

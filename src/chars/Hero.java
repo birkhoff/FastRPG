@@ -3,6 +3,8 @@
  */
 package chars;
 
+import interfaces.IGameChars;
+
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -14,7 +16,7 @@ enum Look {
 	N, NE, E, SE, S, SW, W, NW
 }
 
-public class Hero {
+public class Hero implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
 	BufferedImage[] hero;
@@ -34,11 +36,11 @@ public class Hero {
 	
 	public Hero(float x, float y) {
 		try {
-			image = ImageIO.read(new File("images/sprites/HeroSlash.png"));
+			image = ImageIO.read(new File("images/sprites/HeroComplete2.png"));
 			// The above line throws an checked IOException which must be caught.
 			setWidth(113);
 			setHeight(150);
-			setRows(20);
+			setRows(35);
 			setCols(1);
 
 			hero = new BufferedImage[getRows() * getCols()];
@@ -90,7 +92,7 @@ public class Hero {
 			i=i+1;
 			k = 0;
 		}
-		i= i%20;
+		i= i%35;
 		k+=1;
 		return toImage(hero[i]);
 	}

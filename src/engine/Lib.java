@@ -3,8 +3,7 @@
  */
 
 package engine;
-import Interfaces.IGameObject;
-import chars.*;
+import interfaces.*;
 
 public class Lib {
 
@@ -18,10 +17,10 @@ public class Lib {
 	 * 
 	 * @return
 	 */
-	public static float[] getCenterHero(Hero hero) {
+	public static float[] getCenter(IGameChars obj) {
 		float[] center = new float[2];
-		center[0] = hero.getWidth() / 2;
-		center[1] = hero.getHeight() / 2;
+		center[0] = obj.getWidth() / 2;
+		center[1] = obj.getHeight() / 2;
 		return center;
 	}
 }
