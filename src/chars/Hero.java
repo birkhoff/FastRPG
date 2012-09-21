@@ -36,11 +36,11 @@ public class Hero implements IGameChars {
 	
 	public Hero(float x, float y) {
 		try {
-			image = ImageIO.read(new File("images/sprites/HeroSlash.png"));
+			image = ImageIO.read(new File("images/sprites/HeroComplete2.png"));
 			// The above line throws an checked IOException which must be caught.
 			setWidth(113);
 			setHeight(150);
-			setRows(20);
+			setRows(35);
 			setCols(1);
 
 			hero = new BufferedImage[getRows() * getCols()];
@@ -92,7 +92,7 @@ public class Hero implements IGameChars {
 			i=i+1;
 			k = 0;
 		}
-		i= i%20;
+		i= i%35;
 		k+=1;
 		return toImage(hero[i]);
 	}
