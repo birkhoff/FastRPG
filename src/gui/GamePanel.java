@@ -64,6 +64,8 @@ public class GamePanel extends JFrame implements Runnable {
 	private boolean down;
 	private boolean left;
 	private boolean right;
+	private boolean slash;
+	private boolean initSlash;
 	
 	// Frames zaehlen
 	private long firstFrame = 0;
@@ -140,7 +142,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
 	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
-	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left, 20, 80);
+	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left+" slash: "+slash, 20, 80);
 	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 100);
     	}
     }
@@ -340,23 +342,35 @@ public class GamePanel extends JFrame implements Runnable {
     		float drift = 0.2f;		// Setze 20% Kante zum scrollen
     		float[] center = Lib.getCenter(hero);
     		// Oberer und unterer Rand
-    		if (hero.getPositionY() < mHeight*drift - center[1] && up) {
+    		if (hero.getPositionY() < mHeight*drift - center[1] && up &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8-hero.getStepsize()-MapPosY)) &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8-hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()+tolerance < 0) {
     				driftUp = true;
     				setMapPosY(getMapPosY() + (int) hero.getStepsize());	
     			}
-    		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down) {
+    		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8+hero.getStepsize()-MapPosY)) &&
+								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),
+												(int)(hero.getPositionY()+hero.getHeight()*0.8+hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()-tolerance >= (-1)*(island.getHeight()-mHeight)) {
     				driftDown = true;
     				setMapPosY(getMapPosY() + (int) ((-1)*hero.getStepsize()));
     			}
     		} 
-    		if (hero.getPositionX() < (mWidth*drift) - center[0] && left) {
+    		if (hero.getPositionX() < (mWidth*drift) - center[0] && left &&
+    							!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8-MapPosY))) {
     			if (getMapPosX()+tolerance < 0) {
     				driftLeft = true;
     				setMapPosX(getMapPosX() + (int) hero.getStepsize());
     			}
-    		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right) {
+    		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right &&
+    							!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()+hero.getWidth()*0.8-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.8-MapPosY))) {
     			if (getMapPosX()-tolerance >= (-1)*(island.getWidth()-mWidth)) {
     				driftRight = true;
     				setMapPosX(getMapPosX() + (int) ((-1)*hero.getStepsize()));
@@ -373,7 +387,22 @@ public class GamePanel extends JFrame implements Runnable {
 			float step = hero.getStepsize();
 			boolean gone = false;		
 			
-    		if (up && right) {
+
+			// Catch Up n Down + Left n Right
+			if (left && right) left = false;
+			if (up && down) up = false;
+			
+			//Slashing
+			if(initSlash == true){
+				slash = true;
+				hero.slash();
+			}
+			if(slash == true){
+				slash = hero.isSlash();
+				hero.setStepsize(hero.getStepsize()/2);
+			}
+
+			if (up && right) {
     			if (driftUp && driftRight) {}
     			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth()) {
     				hero.setPositionX(hero.getPositionX()+step);
@@ -469,9 +498,9 @@ public class GamePanel extends JFrame implements Runnable {
     class GameListener implements KeyListener {
     	public void keyPressed(KeyEvent e) {
     		if (debugMode) {
-    			if (e.getKeyCode() == KeyEvent.VK_SPACE)
+    			if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
     				debugMode = false;
-   			} else if (e.getKeyCode() == KeyEvent.VK_SPACE)
+   			} else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
    				debugMode = true;
     		if (turboMode) {
     			if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -489,6 +518,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    			case 38: up = true; break;
 	    			case 39: right = true; break;
 	    			case 40: down = true; break;
+	    			case KeyEvent.VK_SPACE : initSlash = true; break;
 	    			default: break;
 	    		}
         	}
@@ -500,6 +530,8 @@ public class GamePanel extends JFrame implements Runnable {
 	    			case 38: up = false; break;
 	    			case 39: right = false; break;
 	    			case 40: down = false; break;
+	    			case KeyEvent.VK_SPACE : initSlash = false; break;
+	    			//case KeyEvent.VK_SPACE: slash = false; break;
 	    			default: break;
 	    		}
         	}
