@@ -11,11 +11,15 @@ import chars.Mob;
 
 
 public class AssetCreator {
-	private static List<Mob> Mobs = new LinkedList<Mob>();
+	private static LinkedList<Mob> Mobs = new LinkedList<Mob>();
 	
 	public static void getEnemiesFromMap(Map island) {
-//		Objectgroup group = island.getObjectgroup("mobs");
-//		Entity[] entity = group.getObjetcs();
+		Objectgroup group = island.getObjectGroup("mobs");
+		Entity[] entity = group.getObjetcs();
+		for (int i = 0; i < entity.length; i++) {
+			System.out.println("Entities: "+entity.length);
+			createEnemy(entity[i].getName(), entity[i].getX(), entity[i].getY());
+		}
 	}
 	
 	public static void createEnemy(String name, float x, float y) {
@@ -24,10 +28,7 @@ public class AssetCreator {
 	public static void remove(Object obj) {
 		Mobs.remove(obj);
 	}
-	public static List<Mob> getMobs() {
+	public static LinkedList<Mob> getMobs() {
 		return Mobs;
-	}
-	public static void setMobs(List<Mob> mobs) {
-		Mobs = mobs;
 	}
 }

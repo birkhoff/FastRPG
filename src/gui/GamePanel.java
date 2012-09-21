@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.DisplayMode;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -17,11 +18,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.util.LinkedList;
 
 import javax.swing.JFrame;
-
-import com.sun.tools.javac.util.List;
-
 import chars.*;
 import engine.*;
 
@@ -169,11 +169,11 @@ public class GamePanel extends JFrame implements Runnable {
         	countFPS();
         	calcDrift();
         	moveHero();
-//        	List<Mob> Mobs = (List<Mob>) AssetCreator.getMobs();
-//        	for (int i = 0; i < Mobs.size(); i++) {
-//    			Mob mob = Mobs.get(i);
-//    			mob.walk();
-//    		}
+        	LinkedList<Mob> Mobs = AssetCreator.getMobs();
+        	for (int i = 0; i < Mobs.size(); i++) {
+    			Mob mob = Mobs.get(i);
+    			mob.walk();
+    		}
         }
     } 
 
@@ -217,11 +217,11 @@ public class GamePanel extends JFrame implements Runnable {
         beforeTime = gameStartTime;
         running = true;
         hero = new Hero(mWidth/2, mHeight/2);	// create insane hero!
+        AssetCreator.getEnemiesFromMap(island);
         while (running) {
             gameUpdate();
             screenUpdate();
             tolerance = hero.getStepsize();
-            AssetCreator.getEnemiesFromMap(island);
             
             afterTime = System.nanoTime();
             timeDiff = afterTime - beforeTime;
@@ -335,17 +335,22 @@ public class GamePanel extends JFrame implements Runnable {
     	}
     }
     private void drawBackground(Graphics2D g) {
-    	if (state == State.RUN) {    		
+    	if (state == State.RUN) {
+    		// EXPERIMENTAL
+//    		BufferedImage foo = island.getDrawnMap();
+//    		drawMobs(foo.getGraphics());
+//    		g.drawImage(foo, getMapPosX(), getMapPosY(), null);
     		g.drawImage(island.getDrawnMap(), getMapPosX(), getMapPosY(), null);
+    	
     		driftUp = false;
     		driftRight = false;
     		driftDown = false;
     		driftLeft = false;
     	}
     }
-    private void drawMobs(Graphics2D g) {
+    private void drawMobs(Graphics g) {
     	if (state == State.RUN) {
-    		List<Mob> Mobs = (List<Mob>) AssetCreator.getMobs();
+    		LinkedList<Mob> Mobs = AssetCreator.getMobs();
     		for (int i = 0; i < Mobs.size(); i++) {
     			Mob mob = Mobs.get(i);
     			g.drawImage(mob.getImage(), (int)mob.getPositionX(), (int)mob.getPositionY(), null);

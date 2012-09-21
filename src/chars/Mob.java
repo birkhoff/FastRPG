@@ -21,8 +21,10 @@ public class Mob implements IGameChars {
 	public Mob(String name, float x, float y) {
 		this.name = name;
 		try {
-			if (name.equals("gumba"))
+			if (name.equals("gumba")) {
+				System.out.println("Male einen Gumba");
 				setImage(ImageIO.read(new File("images/sprites/mobs/"+name+".png")));
+			}
 		} catch (IOException e) {				
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
