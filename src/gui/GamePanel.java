@@ -405,26 +405,26 @@ public class GamePanel extends JFrame implements Runnable {
 			if (up && right) {
     			if (driftUp && driftRight) {}
     			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth() &&
-    					!island.isSolid((int)(hero.getPositionX()+step+hero.getWidth()*0.8+MapPosX),
-    									(int)(hero.getPositionY()+hero.getHeight()*0.85+MapPosY))) {
+    					!island.isSolid((int)(hero.getPositionX()+step+hero.getWidth()*0.8-MapPosX),
+    									(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()+step);
     			} else if (driftRight && hero.getPositionY() < 0 &&
-    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8+MapPosX),
-										(int)(hero.getPositionY()-step+hero.getHeight()*0.85+MapPosY)) &&
-						!island.isSolid((int)(hero.getPositionX()+MapPosX),
-										(int)(hero.getPositionY()-step+hero.getHeight()*0.85+MapPosY))){
+    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
+										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY)) &&
+						!island.isSolid((int)(hero.getPositionX()-MapPosX),
+										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY))){
     				hero.setPositionY(hero.getPositionY()-step);
     			}  else if (!driftUp && !driftRight) {
     				float dia = (float) (Math.sqrt(2*(step*step))/2);
     				if (hero.getPositionX() <= mWidth-hero.getWidth() && 
-    					!island.isSolid((int)(hero.getPositionX()+dia+hero.getWidth()*0.8+MapPosX),
-    									(int)(hero.getPositionY()+hero.getHeight()*0.85+MapPosY))) 
+    					!island.isSolid((int)(hero.getPositionX()+dia+hero.getWidth()*0.8-MapPosX),
+    									(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) 
     					hero.setPositionX(hero.getPositionX()+dia);
     				if (hero.getPositionY() > 0 && 
-    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8+MapPosX),
-    									(int)(hero.getPositionY()-dia+hero.getHeight()*0.85+MapPosY)) &&
-    					!island.isSolid((int)(hero.getPositionX()+MapPosX),
-    									(int)(hero.getPositionY()-dia+hero.getHeight()*0.85+MapPosY)))
+    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
+    									(int)(hero.getPositionY()-dia+hero.getHeight()*0.85-MapPosY)) &&
+    					!island.isSolid((int)(hero.getPositionX()-MapPosX),
+    									(int)(hero.getPositionY()-dia+hero.getHeight()*0.85-MapPosY)))
     					hero.setPositionY(hero.getPositionY()-dia);    				    				
     				gone = true;
     			}
