@@ -19,7 +19,6 @@ public class Mob implements IGameChars {
 	private BufferedImage image;
 	private int hp;
 	private String name = "";
-	private Look look = Look.S;
 
 	private float stepsize = 3f;
 	
@@ -67,12 +66,6 @@ public class Mob implements IGameChars {
 	}
 	public void setHp(int hp) {
 		this.hp = hp;
-	}
-	public Look getLook() {
-		return look;
-	}
-	public void setLook(Look look) {
-		this.look = look;
 	}
 	public float getStepsize() {
 		return stepsize;
