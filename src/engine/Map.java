@@ -1,4 +1,5 @@
 package engine;
+import Interfaces.*;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -17,12 +18,13 @@ import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.XMLOutputter;
 
 // Has the ability to read out *TMX-Files and build a Map out of them
-public class Map {
+public class Map implements IGameObject{
 	
 	private Document MapXML;
 	private Tileset[] tilesets;
 	private Layer[] layers;
 	private Objectgroup[] objectgroups;
+	private boolean[][] collision;
 	private BufferedImage drawnWorld;
 	
 	private Document doc;
@@ -146,9 +148,28 @@ public class Map {
 											+ tempTSet.getMargin();
 								int y = (gid-fgidMap[neededTileset])/brd*(this.getTileHeight()+tempTSet.getSpacing())
 											+ tempTSet.getMargin();
-								System.out.println("firstgid: " +fgidMap[neededTileset] + "  x: " + x + "    y: " +y);
 								drawingBin.drawImage(tileset[neededTileset].getSubimage(x, y, this.getTileWidth(), this.getTileHeight()), 
 										i*this.getTileWidth(), j*this.getTileHeight(), null);
+							}
+						}
+					}
+				} else if(this.getLayerName(l).equals("collision") || this.getLayerName(l).equals("Collision")){
+					//compute Collision
+					collision = new boolean[this.getWidthInTiles()][this.getHeightInTiles()];
+					for(int i=0; i< this.getWidthInTiles(); i++){
+						for(int j =0; j<this.getHeightInTiles();j++){
+							collision[i][j] = false;
+						}
+					}
+					int[][] formattedTiles = this.getFormattedTiles(l);
+					for(int i=0; i < this.getHeightInTiles(); i++){
+						System.out.print("---\n");
+						for(int j=0; j < this.getWidthInTiles(); j++){
+							int gid = formattedTiles[j][i];
+							System.out.print(","+gid);
+							if(gid != 0){ //don't collide if the gid is 0 (empty field)
+								System.out.println(i + "   " +j);
+								collision[j][i] = true;
 							}
 						}
 					}
@@ -237,6 +258,13 @@ public class Map {
 	
 	public Objectgroup getObjectgroup(int i){
 		return objectgroups[i];
+	}
+
+	@Override
+	public boolean isSolid(int x, int y) {
+		int newx = (x/this.getTileWidth());
+		int newy = (y/this.getTileHeight());
+		return collision[newx][newy];
 	}
 	
 	//*************** End of Getter **************************//

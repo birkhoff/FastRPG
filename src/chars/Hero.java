@@ -23,6 +23,7 @@ public class Hero {
 	private Look look = Look.S;
 	private int i = 0;
 	private int k = 0;
+
 	private float stepsize = 3f;
 	
 	// Properties of Width

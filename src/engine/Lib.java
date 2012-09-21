@@ -3,10 +3,17 @@
  */
 
 package engine;
-
+import Interfaces.IGameObject;
 import chars.*;
 
 public class Lib {
+
+	public boolean isSolid(int x, int y, IGameObject obj){
+		if(obj.isSolid(x, y)){
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * 
 	 * @return
