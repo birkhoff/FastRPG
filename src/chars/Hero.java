@@ -14,9 +14,6 @@ import javax.imageio.ImageIO;
 
 import weapons.SimpleSword;
 
-enum Look {
-	N, NE, E, SE, S, SW, W, NW, SlashingS
-}
 
 public class Hero implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
@@ -24,7 +21,6 @@ public class Hero implements IGameChars {
 	BufferedImage[] hero;
 	private int hp;
 	private String name = "Insane";
-	private Look look = Look.S;
 	private int i = 0;
 	private int k = 0;
 
@@ -37,10 +33,14 @@ public class Hero implements IGameChars {
 	private int cols;
 	private boolean slash;
 	private int numberOfSlashSprites;
+	private int oneSlash;
+	private int maxSlash;
+	private boolean standing;
+	private int look;
 	
 	
 	//Loads a SimpleSword
-	private SimpleSword sowrd;
+	private SimpleSword sword;
 	
 	public Hero(float x, float y) {
 		try {
@@ -50,7 +50,9 @@ public class Hero implements IGameChars {
 			setHeight(150);
 			setRows(35);
 			setCols(1);
-			this.setNumberOfSlashSprites(20);
+			this.setNumberOfSlashSprites(10);		// number of slash pictures which will be shown after one 'slash-button' press
+			oneSlash = 10;							// number of pictures of one slash
+			maxSlash = 20;							// number of maximal slash pictures
 
 			hero = new BufferedImage[getRows() * getCols()];
 
@@ -76,6 +78,20 @@ public class Hero implements IGameChars {
 	
 	public void slash(){
 		setSlash(true);
+		this.setStepsize(getStepsize()/2);
+		i=0;
+		k=0;
+	}
+	
+	
+	public void addStrike(){
+		int i = getNumberOfSlashSprites()+oneSlash;
+		if(i>=maxSlash) i = maxSlash;
+		this.setNumberOfSlashSprites(i);
+	}
+	
+	public void resetStrike(){
+		this.setNumberOfSlashSprites(oneSlash);
 	}
 	
 	public Image toImage(BufferedImage bufferedImage) {
@@ -102,25 +118,72 @@ public class Hero implements IGameChars {
 	}
 	public Image getImage() {
 		
-		if(isSlash()){
+		// GET THE SLASHING SPRITES
+		if(isSlash()){		
 			if(k>1){
 				i=i+1;
 				k = 0;
 			}
 			i= i%getNumberOfSlashSprites();
 			k+=1;
-			if( i >= getNumberOfSlashSprites()-1) this.setSlash(false);
-			return toImage(hero[i+14]);
+			if( i >= getNumberOfSlashSprites()-1){
+				this.setSlash(false);
+				this.setStepsize(getStepsize()*2);
+				this.resetStrike();
+				k = 0;
+				i = 0;
+			}
+			return toImage(hero[i+15]);
 		}
 		
-		if(k>1){
-			i=i+1;
-			k = 0;
+		// GET STANDING SPRITE
+		if(isStanding()){
+			k=0;
+			i=0;
+			return toImage(hero[1]);
 		}
-		i= i%7;
-		k+=1;
-		return toImage(hero[i]);
+		//Get Front Moving Sprites
+		if(this.getLook()==4 || this.getLook()==5 || this.getLook()==6){
+			if(k>1){
+				i=i+1;
+				k = 0;
+			}
+			i= i%7;
+			k+=1;
+			return toImage(hero[i+1]);
+		}
+		
+		//Get Back Moving Sprites
+		if(this.getLook()==7 || this.getLook()==0 || this.getLook()==1){
+			if(k>1){
+				i=i+1;
+				k = 0;
+			}
+			i= i%7;
+			k+=1;
+			return toImage(hero[i+8]);
+		}
+		return toImage(hero[0]);
 	}
+	
+	public void setLook(int i){
+		switch(i){
+			case 0: this.look = 0;	 /*look.N; 	*/	break;
+			case 1: this.look = 1;	/*look.NE;	*/	break;
+			case 2: this.look = 2;	/*look.E;	*/	break;
+			case 3: this.look = 3;	/*look.SE;	*/	break;
+			case 4: this.look = 4;	/*look.S;	*/	break;
+			case 5: this.look = 5;	/*look.SW;	*/	break;
+			case 6: this.look = 6;	/*look.W;	*/	break;
+			case 7: this.look = 7;	/*look.NW;	*/	break;
+		
+		}
+	}
+	
+	public int getLook(){
+		return this.look;
+	}
+	
 	public void setImage(Image image) {
 		this.image = (BufferedImage) image;
 	}
@@ -130,12 +193,7 @@ public class Hero implements IGameChars {
 	public void setHp(int hp) {
 		this.hp = hp;
 	}
-	public Look getLook() {
-		return look;
-	}
-	public void setLook(Look look) {
-		this.look = look;
-	}
+	
 	public float getStepsize() {
 		return stepsize;
 	}
@@ -181,5 +239,13 @@ public class Hero implements IGameChars {
 
 	public int getNumberOfSlashSprites() {
 		return numberOfSlashSprites;
+	}
+
+	public void setStanding(boolean standing) {
+		this.standing = standing;
+	}
+
+	public boolean isStanding() {
+		return standing;
 	}
 }

@@ -142,7 +142,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
 	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
-	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left+" slash: "+slash, 20, 80);
+	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left+" slash: "+slash+" stepsize: "+hero.getStepsize(), 20, 80);
 	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 100);
     	}
     }
@@ -392,14 +392,21 @@ public class GamePanel extends JFrame implements Runnable {
 			if (left && right) left = false;
 			if (up && down) up = false;
 			
+			if(up || down || right || left){
+				hero.setStanding(false);
+			}else{
+				hero.setStanding(true);
+			}
+			
 			//Slashing
 			if(initSlash == true){
 				slash = true;
 				hero.slash();
+				initSlash = false;
 			}
 			if(slash == true){
 				slash = hero.isSlash();
-				hero.setStepsize(hero.getStepsize()/2);
+
 			}
 
 			if (up && right) {
@@ -467,17 +474,29 @@ public class GamePanel extends JFrame implements Runnable {
     		else if (up && !gone && !driftUp && hero.getPositionY() > 0 && 
     								!island.isSolid((int)hero.getPositionX()-MapPosX, (int)(hero.getPositionY()-hero.getStepsize()-MapPosY+hero.getHeight()*0.85)) &&
     								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),(int)(hero.getPositionY()-hero.getStepsize()-MapPosY+hero.getHeight()*0.85)))
+    		{
     			hero.setPositionY(hero.getPositionY()-hero.getStepsize());
+    			hero.setLook(0);
+		}
     		else if (right && !gone && !driftRight && hero.getPositionX() < mWidth-hero.getWidth() &&
     								!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()-MapPosX+hero.getWidth()*0.8), (int)(hero.getPositionY()-MapPosY+hero.getHeight()*0.85)))
+		{
     			hero.setPositionX(hero.getPositionX()+hero.getStepsize());
+    			hero.setLook(2);
+		}
     		else if (down && !gone && !driftDown && hero.getPositionY() < mHeight-hero.getHeight() &&
     								!island.isSolid((int)hero.getPositionX()-MapPosX, (int)(hero.getPositionY()+hero.getStepsize()-MapPosY+hero.getHeight()-hero.getHeight()*0.15)) &&
     								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8), (int)(hero.getPositionY()+hero.getStepsize()-MapPosY+hero.getHeight()*0.85)))
+    			{
     			hero.setPositionY(hero.getPositionY()+hero.getStepsize());
+    			hero.setLook(4);
+    			}
     		else if (left && !gone && !driftLeft && hero.getPositionX() > 0 &&
     								!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX), (int)(hero.getPositionY()-MapPosY+hero.getHeight()*0.85)))
+    			{
     			hero.setPositionX(hero.getPositionX()-hero.getStepsize());
+    			hero.setLook(6);
+    			}
     	}
     }
     public int getMapPosX() {
@@ -518,7 +537,13 @@ public class GamePanel extends JFrame implements Runnable {
 	    			case 38: up = true; break;
 	    			case 39: right = true; break;
 	    			case 40: down = true; break;
-	    			case KeyEvent.VK_SPACE : initSlash = true; break;
+	    			case KeyEvent.VK_SPACE : 
+	    				if(slash){
+	    					hero.addStrike();
+	    				}else{
+	    					initSlash = true; 
+	    				}
+	    				break;
 	    			default: break;
 	    		}
         	}
