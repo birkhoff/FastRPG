@@ -153,7 +153,7 @@ public class Map implements IGameObject{
 							}
 						}
 					}
-				} else if(this.getLayerName(l).equals("collision") && !this.getLayerName(l).equals("Collision")){
+				} else if(this.getLayerName(l).equals("collision") || this.getLayerName(l).equals("Collision")){
 					//compute Collision
 					collision = new boolean[this.getWidthInTiles()][this.getHeightInTiles()];
 					for(int i=0; i< this.getWidthInTiles(); i++){
@@ -163,9 +163,11 @@ public class Map implements IGameObject{
 					}
 					int[][] formattedTiles = this.getFormattedTiles(l);
 					for(int i=0; i < this.getWidthInTiles(); i++){
-						for(int j=0; j < this.getHeightInTiles(); j++){ //i,j for x,y of the map
+						for(int j=0; j < this.getHeightInTiles(); j++){
 							int gid = formattedTiles[i][j];
+							System.out.println(i + "  " + j);
 							if(gid != 0){ //don't collide if the gid is 0 (empty field)
+								//System.out.println(i + "   " +j);
 								collision[i][j] = true;
 							}
 						}

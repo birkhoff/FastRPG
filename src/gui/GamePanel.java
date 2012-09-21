@@ -431,11 +431,14 @@ public class GamePanel extends JFrame implements Runnable {
     		else if (up && !gone && !driftUp && hero.getPositionY() > 0 && 
     								!island.isSolid((int)hero.getPositionX(), (int)(hero.getPositionY()-hero.getStepsize())))
     				hero.setPositionY(hero.getPositionY()-hero.getStepsize());
-    		else if (right && !gone && !driftRight && hero.getPositionX() < mWidth-hero.getWidth())
+    		else if (right && !gone && !driftRight && hero.getPositionX() < mWidth-hero.getWidth() &&
+    								!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()), (int)hero.getPositionY()))
     			hero.setPositionX(hero.getPositionX()+hero.getStepsize());
-    		else if (down && !gone && !driftDown && hero.getPositionY() < mHeight-hero.getHeight())
+    		else if (down && !gone && !driftDown && hero.getPositionY() < mHeight-hero.getHeight() &&
+    								!island.isSolid((int)hero.getPositionX(), (int)(hero.getPositionY()+hero.getStepsize())))
     			hero.setPositionY(hero.getPositionY()+hero.getStepsize());
-    		else if (left && !gone && !driftLeft && hero.getPositionX() > 0)
+    		else if (left && !gone && !driftLeft && hero.getPositionX() > 0 &&
+    								!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()), (int)hero.getPositionY()))
     			hero.setPositionX(hero.getPositionX()-hero.getStepsize());
     	}
     }
