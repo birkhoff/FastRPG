@@ -1,62 +1,33 @@
-/**
- * The Hero class. Having attributes, position and the image file
- */
 package chars;
-
-import interfaces.IGameChars;
 
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
-enum Look {
+import interfaces.IGameChars;
+
+enum LookMob {
 	N, NE, E, SE, S, SW, W, NW
 }
 
-public class Hero implements IGameChars {
+public class Mob implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
 	BufferedImage[] hero;
 	private int hp;
-	private String name = "Insane";
+	private String name = "Mobby";
 	private Look look = Look.S;
-	private int i = 0;
-	private int k = 0;
 
 	private float stepsize = 3f;
 	
-	// Properties of Width
-	private int width;
-	private int height;
-	private int rows;
-	private int cols;
-	
-	public Hero(float x, float y) {
+	public Mob(String name, float x, float y) {
 		try {
-			image = ImageIO.read(new File("images/sprites/HeroSlash.png"));
-			// The above line throws an checked IOException which must be caught.
-			setWidth(113);
-			setHeight(150);
-			setRows(20);
-			setCols(1);
-
-			hero = new BufferedImage[getRows() * getCols()];
-
-			for (int i = 0; i < getRows(); i++)
-			{
-			    for (int j = 0; j < getCols(); j++)
-			    {
-			        hero[(i * getCols()) + j] = image.getSubimage(
-			            j * getWidth(),
-			            i * getHeight(),
-			            getWidth(),
-			            getHeight()
-			        );
-			    }
-			}
+			if (name.equals("Gumba"))
+				setImage(ImageIO.read(new File("images/sprites/"+name+".png")));
 		} catch (IOException e) {				
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
@@ -87,18 +58,6 @@ public class Hero implements IGameChars {
 	public void setPositionY(float position) {
 		this.position[1] = position;
 	}
-	public Image getImage() {
-		if(k>1){
-			i=i+1;
-			k = 0;
-		}
-		i= i%20;
-		k+=1;
-		return toImage(hero[i]);
-	}
-	public void setImage(Image image) {
-		this.image = (BufferedImage) image;
-	}
 	public int getHp() {
 		return hp;
 	}
@@ -117,28 +76,24 @@ public class Hero implements IGameChars {
 	public void setStepsize(float stepsize) {
 		this.stepsize = stepsize;
 	}
+
+	public BufferedImage getImage() {
+		return image;
+	}
+
+	public void setImage(BufferedImage image) {
+		this.image = image;
+	}
+
+	@Override
 	public int getWidth() {
-		return width;
+		// TODO Auto-generated method stub
+		return 0;
 	}
-	public void setWidth(int width) {
-		this.width = width;
-	}
+
+	@Override
 	public int getHeight() {
-		return height;
-	}
-	public void setHeight(int height) {
-		this.height = height;
-	}
-	public int getRows() {
-		return rows;
-	}
-	public void setRows(int rows) {
-		this.rows = rows;
-	}
-	public int getCols() {
-		return cols;
-	}
-	public void setCols(int cols) {
-		this.cols = cols;
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
