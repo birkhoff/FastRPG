@@ -3,9 +3,8 @@
  */
 
 package engine;
-
-<<<<<<< HEAD
 import Interfaces.IGameObject;
+import chars.*;
 
 public class Lib {
 
@@ -15,11 +14,6 @@ public class Lib {
 		}
 		return false;
 	}
-	
-=======
-import chars.*;
-
-public class Lib {
 	/**
 	 * 
 	 * @return
@@ -30,5 +24,4 @@ public class Lib {
 		center[1] = hero.getHeight() / 2;
 		return center;
 	}
->>>>>>> 41a3fa278f3ef557d636a8e9e82cc84dfbdce4c3
 }

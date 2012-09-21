@@ -148,37 +148,25 @@ public class Map implements IGameObject{
 											+ tempTSet.getMargin();
 								int y = (gid-fgidMap[neededTileset])/brd*(this.getTileHeight()+tempTSet.getSpacing())
 											+ tempTSet.getMargin();
-								System.out.println("firstgid: " +fgidMap[neededTileset] + "  x: " + x + "    y: " +y);
 								drawingBin.drawImage(tileset[neededTileset].getSubimage(x, y, this.getTileWidth(), this.getTileHeight()), 
 										i*this.getTileWidth(), j*this.getTileHeight(), null);
 							}
 						}
 					}
-				} else {
+				} else if(this.getLayerName(l).equals("collision") && !this.getLayerName(l).equals("Collision")){
 					//compute Collision
-					collision = new boolean[this.getWidth()][this.getHeight()];
-					//Speicherplatzverschwndung - Fix wenn Geschwindigkeit needed
+					collision = new boolean[this.getWidthInTiles()][this.getHeightInTiles()];
+					for(int i=0; i< this.getWidthInTiles(); i++){
+						for(int j =0; j<this.getHeightInTiles();j++){
+							collision[i][j] = false;
+						}
+					}
 					int[][] formattedTiles = this.getFormattedTiles(l);
 					for(int i=0; i < this.getWidthInTiles(); i++){
 						for(int j=0; j < this.getHeightInTiles(); j++){ //i,j for x,y of the map
 							int gid = formattedTiles[i][j];
-							if(gid != 0){ //don't draw if the gid is 0 (empty field)
-								int neededTileset = 0;
-								for(int k=0; k < fgidMap.length; k++){ //compute the corresponding tileset of the tile
-									if(fgidMap[k] <= gid){
-										neededTileset = k;
-									} else {
-										break;
-									}
-								}
-								Tileset tempTSet = this.getTileset(neededTileset);
-								int brd = (tempTSet.getImagewidth() - tempTSet.getMargin()*2 + tempTSet.getSpacing()) / 
-										(this.getTileWidth() + tempTSet.getSpacing()); //compute linebreak (width in tiles)
-								int x = (gid-fgidMap[neededTileset])%brd*(this.getTileWidth()+tempTSet.getSpacing()) 
-											+ tempTSet.getMargin();
-								int y = (gid-fgidMap[neededTileset])/brd*(this.getTileHeight()+tempTSet.getSpacing())
-											+ tempTSet.getMargin();
-								collision[x][y] = true;
+							if(gid != 0){ //don't collide if the gid is 0 (empty field)
+								collision[i][j] = true;
 							}
 						}
 					}
@@ -271,12 +259,9 @@ public class Map implements IGameObject{
 
 	@Override
 	public boolean isSolid(int x, int y) {
-		int newx = (x/this.getTileWidth())*this.getTileWidth();
-		int newy = (y/this.getTileHeight())*this.getTileHeight();
-		if(collision[newx][newy]){
-			return true;
-		}
-		return false;
+		int newx = (x/this.getTileWidth());
+		int newy = (y/this.getTileHeight());
+		return collision[newx][newy];
 	}
 	
 	//*************** End of Getter **************************//

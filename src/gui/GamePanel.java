@@ -423,8 +423,9 @@ public class GamePanel extends JFrame implements Runnable {
     				gone = true;
     			}
     		} 
-    		else if (up && !gone && !driftUp && hero.getPositionY() > 0)
-    			hero.setPositionY(hero.getPositionY()-hero.getStepsize());
+    		else if (up && !gone && !driftUp && hero.getPositionY() > 0 && 
+    								!island.isSolid((int)hero.getPositionX(), (int)(hero.getPositionY()-hero.getStepsize())))
+    				hero.setPositionY(hero.getPositionY()-hero.getStepsize());
     		else if (right && !gone && !driftRight && hero.getPositionX() < mWidth-hero.getWidth())
     			hero.setPositionX(hero.getPositionX()+hero.getStepsize());
     		else if (down && !gone && !driftDown && hero.getPositionY() < mHeight-hero.getHeight())
