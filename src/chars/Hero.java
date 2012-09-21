@@ -12,8 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import weapons.SimpleSword;
+
 enum Look {
-	N, NE, E, SE, S, SW, W, NW
+	N, NE, E, SE, S, SW, W, NW, SlashingS
 }
 
 public class Hero implements IGameChars {
@@ -33,6 +35,12 @@ public class Hero implements IGameChars {
 	private int height;
 	private int rows;
 	private int cols;
+	private boolean slash;
+	private int numberOfSlashSprites;
+	
+	
+	//Loads a SimpleSword
+	private SimpleSword sowrd;
 	
 	public Hero(float x, float y) {
 		try {
@@ -42,6 +50,7 @@ public class Hero implements IGameChars {
 			setHeight(150);
 			setRows(35);
 			setCols(1);
+			this.setNumberOfSlashSprites(20);
 
 			hero = new BufferedImage[getRows() * getCols()];
 
@@ -63,6 +72,10 @@ public class Hero implements IGameChars {
 		position = new float[2];
 		position[0] = x;
 		position[1] = y;
+	}
+	
+	public void slash(){
+		setSlash(true);
 	}
 	
 	public Image toImage(BufferedImage bufferedImage) {
@@ -88,11 +101,23 @@ public class Hero implements IGameChars {
 		this.position[1] = position;
 	}
 	public Image getImage() {
+		
+		if(isSlash()){
+			if(k>1){
+				i=i+1;
+				k = 0;
+			}
+			i= i%getNumberOfSlashSprites();
+			k+=1;
+			if( i >= getNumberOfSlashSprites()-1) this.setSlash(false);
+			return toImage(hero[i+14]);
+		}
+		
 		if(k>1){
 			i=i+1;
 			k = 0;
 		}
-		i= i%35;
+		i= i%7;
 		k+=1;
 		return toImage(hero[i]);
 	}
@@ -140,5 +165,21 @@ public class Hero implements IGameChars {
 	}
 	public void setCols(int cols) {
 		this.cols = cols;
+	}
+
+	public void setSlash(boolean slash) {
+		this.slash = slash;
+	}
+
+	public boolean isSlash() {
+		return slash;
+	}
+
+	public void setNumberOfSlashSprites(int numberOfSlashSprites) {
+		this.numberOfSlashSprites = numberOfSlashSprites;
+	}
+
+	public int getNumberOfSlashSprites() {
+		return numberOfSlashSprites;
 	}
 }
