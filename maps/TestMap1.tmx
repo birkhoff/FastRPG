@@ -217,12 +217,7 @@
     <property name="spawnpoint" value=""/>
    </properties>
   </object>
-  <object name="Gumba" type="spawnpoint" x="611" y="348">
-   <properties>
-    <property name="name" value="gumba"/>
-   </properties>
-  </object>
-  <object name="Gumba" type="spawnpoint" x="659" y="434">
+  <object name="Gumba" type="spawnpoint" x="611" y="348" width="50" height="50">
    <properties>
     <property name="name" value="gumba"/>
    </properties>
