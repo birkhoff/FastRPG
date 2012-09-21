@@ -436,16 +436,18 @@ public class GamePanel extends JFrame implements Runnable {
     			}
     		} 
     		else if (up && !gone && !driftUp && hero.getPositionY() > 0 && 
-    								!island.isSolid((int)hero.getPositionX(), (int)(hero.getPositionY()-hero.getStepsize())))
-    				hero.setPositionY(hero.getPositionY()-hero.getStepsize());
+    								!island.isSolid((int)hero.getPositionX()-MapPosX, (int)(hero.getPositionY()-hero.getStepsize()-MapPosY+hero.getHeight()*0.85)) &&
+    								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),(int)(hero.getPositionY()-hero.getStepsize()-MapPosY+hero.getHeight()*0.85)))
+    			hero.setPositionY(hero.getPositionY()-hero.getStepsize());
     		else if (right && !gone && !driftRight && hero.getPositionX() < mWidth-hero.getWidth() &&
-    								!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()), (int)hero.getPositionY()))
+    								!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()-MapPosX+hero.getWidth()*0.8), (int)(hero.getPositionY()-MapPosY+hero.getHeight()*0.85)))
     			hero.setPositionX(hero.getPositionX()+hero.getStepsize());
     		else if (down && !gone && !driftDown && hero.getPositionY() < mHeight-hero.getHeight() &&
-    								!island.isSolid((int)hero.getPositionX(), (int)(hero.getPositionY()+hero.getStepsize())))
+    								!island.isSolid((int)hero.getPositionX()-MapPosX, (int)(hero.getPositionY()+hero.getStepsize()-MapPosY+hero.getHeight()-hero.getHeight()*0.15)) &&
+    								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8), (int)(hero.getPositionY()+hero.getStepsize()-MapPosY+hero.getHeight()*0.85)))
     			hero.setPositionY(hero.getPositionY()+hero.getStepsize());
     		else if (left && !gone && !driftLeft && hero.getPositionX() > 0 &&
-    								!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()), (int)hero.getPositionY()))
+    								!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX), (int)(hero.getPositionY()-MapPosY+hero.getHeight()*0.85)))
     			hero.setPositionX(hero.getPositionX()-hero.getStepsize());
     	}
     }
