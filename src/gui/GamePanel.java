@@ -385,10 +385,6 @@ public class GamePanel extends JFrame implements Runnable {
 			float step = hero.getStepsize();
 			boolean gone = false;		
 			
-			// Catch Up n Down + Left n Right
-			if (left && right) left = false;
-			if (up && down) up = false;
-			
     		if (up && right) {
     			if (driftUp && driftRight) {}
     			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth()) {

@@ -17,17 +17,17 @@ enum LookMob {
 public class Mob implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
-	BufferedImage[] hero;
 	private int hp;
-	private String name = "Mobby";
+	private String name = "";
 	private Look look = Look.S;
 
 	private float stepsize = 3f;
 	
 	public Mob(String name, float x, float y) {
+		this.name = name;
 		try {
-			if (name.equals("Gumba"))
-				setImage(ImageIO.read(new File("images/sprites/"+name+".png")));
+			if (name.equals("gumba"))
+				setImage(ImageIO.read(new File("images/sprites/mobs/"+name+".png")));
 		} catch (IOException e) {				
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
@@ -38,6 +38,10 @@ public class Mob implements IGameChars {
 	
 	public Image toImage(BufferedImage bufferedImage) {
 	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
+	}
+	
+	private void walk() {
+		
 	}
 	/******************* Getter und Setter ******************/
 	public float getPositionX() {
