@@ -64,6 +64,8 @@ public class GamePanel extends JFrame implements Runnable {
 	private boolean down;
 	private boolean left;
 	private boolean right;
+	private boolean slash;
+	private boolean initSlash;
 	
 	// Frames zaehlen
 	private long firstFrame = 0;
@@ -140,7 +142,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
 	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
-	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left, 20, 80);
+	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left+" slash: "+slash, 20, 80);
 	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 100);
     	}
     }
@@ -377,6 +379,16 @@ public class GamePanel extends JFrame implements Runnable {
 			if (left && right) left = false;
 			if (up && down) up = false;
 			
+			//Slashing
+			if(initSlash == true){
+				slash = true;
+				hero.slash();
+			}
+			if(slash == true){
+				slash = hero.isSlash();
+				hero.setStepsize(hero.getStepsize()/2);
+			}
+
     		if (up && right) {
     			if (driftUp && driftRight) {}
     			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth()) {
@@ -473,9 +485,9 @@ public class GamePanel extends JFrame implements Runnable {
     class GameListener implements KeyListener {
     	public void keyPressed(KeyEvent e) {
     		if (debugMode) {
-    			if (e.getKeyCode() == KeyEvent.VK_SPACE)
+    			if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
     				debugMode = false;
-   			} else if (e.getKeyCode() == KeyEvent.VK_SPACE)
+   			} else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
    				debugMode = true;
     		if (turboMode) {
     			if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -493,6 +505,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    			case 38: up = true; break;
 	    			case 39: right = true; break;
 	    			case 40: down = true; break;
+	    			case KeyEvent.VK_SPACE : initSlash = true; break;
 	    			default: break;
 	    		}
         	}
@@ -504,6 +517,8 @@ public class GamePanel extends JFrame implements Runnable {
 	    			case 38: up = false; break;
 	    			case 39: right = false; break;
 	    			case 40: down = false; break;
+	    			case KeyEvent.VK_SPACE : initSlash = false; break;
+	    			//case KeyEvent.VK_SPACE: slash = false; break;
 	    			default: break;
 	    		}
         	}
