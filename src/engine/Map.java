@@ -162,13 +162,14 @@ public class Map implements IGameObject{
 						}
 					}
 					int[][] formattedTiles = this.getFormattedTiles(l);
-					for(int i=0; i < this.getWidthInTiles(); i++){
-						for(int j=0; j < this.getHeightInTiles(); j++){
-							int gid = formattedTiles[i][j];
-							System.out.println(i + "  " + j);
+					for(int i=0; i < this.getHeightInTiles(); i++){
+						System.out.print("---\n");
+						for(int j=0; j < this.getWidthInTiles(); j++){
+							int gid = formattedTiles[j][i];
+							System.out.print(","+gid);
 							if(gid != 0){ //don't collide if the gid is 0 (empty field)
-								//System.out.println(i + "   " +j);
-								collision[i][j] = true;
+								System.out.println(i + "   " +j);
+								collision[j][i] = true;
 							}
 						}
 					}
