@@ -76,8 +76,8 @@ public class GamePanel extends JFrame implements Runnable {
 	private boolean driftRight;
 	private boolean driftDown;
 	private boolean driftLeft;
-	private int bgPosX = 0;
-	private int bgPosY = 0;
+	private int MapPosX = 0;
+	private int MapPosY = 0;
 	
 	// Objects
 	private Hero hero;
@@ -139,7 +139,9 @@ public class GamePanel extends JFrame implements Runnable {
     	if (debugMode) {
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
-	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 60);
+	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
+	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left, 20, 80);
+	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 100);
     	}
     }
     
@@ -288,8 +290,7 @@ public class GamePanel extends JFrame implements Runnable {
         }
         try {
             Thread.sleep(500);
-        } catch (InterruptedException ex) {
-        }
+        } catch (InterruptedException ex) {}
         bufferStrategy = getBufferStrategy();
     }
 
@@ -322,7 +323,7 @@ public class GamePanel extends JFrame implements Runnable {
     }
     private void drawBackground(Graphics2D g) {
     	if (state == State.RUN) {    		
-    		g.drawImage(island.getDrawnMap(), bgPosX, bgPosY, null);
+    		g.drawImage(island.getDrawnMap(), getMapPosX(), getMapPosY(), null);
     		driftUp = false;
     		driftRight = false;
     		driftDown = false;
@@ -340,25 +341,25 @@ public class GamePanel extends JFrame implements Runnable {
     		float[] center = Lib.getCenterHero(hero);
     		// Oberer und unterer Rand
     		if (hero.getPositionY() < mHeight*drift - center[1] && up) {
-    			if (bgPosY+tolerance < 0) {
+    			if (getMapPosY()+tolerance < 0) {
     				driftUp = true;
-    				bgPosY += (int) hero.getStepsize();	
+    				setMapPosY(getMapPosY() + (int) hero.getStepsize());	
     			}
     		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down) {
-    			if (bgPosY-tolerance >= (-1)*(island.getHeight()-mHeight)) {
+    			if (getMapPosY()-tolerance >= (-1)*(island.getHeight()-mHeight)) {
     				driftDown = true;
-    				bgPosY += (int) ((-1)*hero.getStepsize());
+    				setMapPosY(getMapPosY() + (int) ((-1)*hero.getStepsize()));
     			}
     		} 
     		if (hero.getPositionX() < (mWidth*drift) - center[0] && left) {
-    			if (bgPosX+tolerance < 0) {
+    			if (getMapPosX()+tolerance < 0) {
     				driftLeft = true;
-    				bgPosX += (int) hero.getStepsize();
+    				setMapPosX(getMapPosX() + (int) hero.getStepsize());
     			}
     		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right) {
-    			if (bgPosX-tolerance >= (-1)*(island.getWidth()-mWidth)) {
+    			if (getMapPosX()-tolerance >= (-1)*(island.getWidth()-mWidth)) {
     				driftRight = true;
-    				bgPosX += (int) ((-1)*hero.getStepsize());
+    				setMapPosX(getMapPosX() + (int) ((-1)*hero.getStepsize()));
     			}
     		}
     	}
@@ -371,7 +372,11 @@ public class GamePanel extends JFrame implements Runnable {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
 			boolean gone = false;		
-
+			
+			// Catch Up n Down + Left n Right
+			if (left && right) left = false;
+			if (up && down) up = false;
+			
     		if (up && right) {
     			if (driftUp && driftRight) {}
     			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth()) {
@@ -389,7 +394,10 @@ public class GamePanel extends JFrame implements Runnable {
     		} else if (right && down) {
     			if (driftRight && driftDown) {}
     			else if (driftRight && hero.getPositionY() < mHeight-hero.getHeight()) {
-    				hero.setPositionY(hero.getPositionY()+step);
+    				if (down)
+    					hero.setPositionY(hero.getPositionY()+step);
+    				else if (up) 
+    					hero.setPositionY(hero.getPositionY()-step);
     			} else if (driftDown && hero.getPositionX() < mWidth-hero.getWidth()) {
     				hero.setPositionX(hero.getPositionX()+step);
     			} else {
@@ -404,8 +412,10 @@ public class GamePanel extends JFrame implements Runnable {
     			if (driftDown && driftLeft) {}
     			else if (driftDown && hero.getPositionX() > 0) {
     				hero.setPositionX(hero.getPositionX()-step);
+    				gone = true;
     			} else if (driftLeft && hero.getPositionY() < mHeight-hero.getHeight() ) {
     				hero.setPositionY(hero.getPositionY()+step);
+    				gone = true;
     			} else {
 	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
 	    			if (hero.getPositionX() > 0)
@@ -443,7 +453,19 @@ public class GamePanel extends JFrame implements Runnable {
     			hero.setPositionX(hero.getPositionX()-hero.getStepsize());
     	}
     }
-    /**
+    public int getMapPosX() {
+		return MapPosX;
+	}
+	public void setMapPosX(int bgPosX) {
+		this.MapPosX = bgPosX;
+	}
+	public int getMapPosY() {
+		return MapPosY;
+	}
+	public void setMapPosY(int mapPosY) {
+		MapPosY = mapPosY;
+	}
+	/**
      * Alles moegliche, um Tastatureingaben zu lesen. 
      */
     class GameListener implements KeyListener {
