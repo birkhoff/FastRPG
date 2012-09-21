@@ -19,6 +19,9 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
+
+import com.sun.tools.javac.util.List;
+
 import chars.*;
 import engine.*;
 
@@ -134,6 +137,7 @@ public class GamePanel extends JFrame implements Runnable {
 			case RUN :
 				drawBackground(gScr);
 				drawHero(gScr);	// get ya hero on the screen!
+//				drawMobs(gScr);
 				break;
 			case PAUSE :
 				break;
@@ -165,6 +169,11 @@ public class GamePanel extends JFrame implements Runnable {
         	countFPS();
         	calcDrift();
         	moveHero();
+//        	List<Mob> Mobs = (List<Mob>) AssetCreator.getMobs();
+//        	for (int i = 0; i < Mobs.size(); i++) {
+//    			Mob mob = Mobs.get(i);
+//    			mob.walk();
+//    		}
         }
     } 
 
@@ -212,6 +221,8 @@ public class GamePanel extends JFrame implements Runnable {
             gameUpdate();
             screenUpdate();
             tolerance = hero.getStepsize();
+            AssetCreator.getEnemiesFromMap(island);
+            
             afterTime = System.nanoTime();
             timeDiff = afterTime - beforeTime;
             sleepTime = period - timeDiff - overSleepTime;
@@ -330,6 +341,15 @@ public class GamePanel extends JFrame implements Runnable {
     		driftRight = false;
     		driftDown = false;
     		driftLeft = false;
+    	}
+    }
+    private void drawMobs(Graphics2D g) {
+    	if (state == State.RUN) {
+    		List<Mob> Mobs = (List<Mob>) AssetCreator.getMobs();
+    		for (int i = 0; i < Mobs.size(); i++) {
+    			Mob mob = Mobs.get(i);
+    			g.drawImage(mob.getImage(), (int)mob.getPositionX(), (int)mob.getPositionY(), null);
+    		}
     	}
     }
     /******************** /Draw Methoden/ *********************/

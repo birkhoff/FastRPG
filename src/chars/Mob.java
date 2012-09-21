@@ -5,21 +5,16 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
-
+import engine.AssetCreator;
 import interfaces.IGameChars;
 
-enum LookMob {
-	N, NE, E, SE, S, SW, W, NW
-}
 
 public class Mob implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
 	private int hp;
 	private String name = "";
-	private Look look = Look.S;
 
 	private float stepsize = 3f;
 	
@@ -40,8 +35,9 @@ public class Mob implements IGameChars {
 	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
 	}
 	
-	private void walk() {
-		
+	public void walk() {
+		position[0] += (float) (Math.random()*stepsize);
+		position[1] += (float) (Math.random()*stepsize);
 	}
 	/******************* Getter und Setter ******************/
 	public float getPositionX() {
@@ -66,13 +62,10 @@ public class Mob implements IGameChars {
 		return hp;
 	}
 	public void setHp(int hp) {
+		if (hp <= 0) {
+			AssetCreator.remove(this);
+		}
 		this.hp = hp;
-	}
-	public Look getLook() {
-		return look;
-	}
-	public void setLook(Look look) {
-		this.look = look;
 	}
 	public float getStepsize() {
 		return stepsize;
