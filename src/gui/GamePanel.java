@@ -617,7 +617,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    					hero.addStrike();
 	    				}else{
 	    					initSlash = true; 
-	    					hero.sword.setAlpha(30); //resets the angle of the sword
+	    					hero.sword.setAlpha(40); //resets the angle of the sword
 	    				}
 	    				break;
 	    			default: break;

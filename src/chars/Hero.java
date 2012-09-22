@@ -124,8 +124,8 @@ public class Hero implements IGameChars {
 		
 		sword.setAlpha(sword.getAlpha()+10);
 		sword.setImage( sword.rotateImage((int)sword.getAlpha()) );
-		sword.setX(this.getPositionX()-40+(float)(sword.getAlpha()/4));
-		sword.setY(this.getPositionY()-20+(float)(sword.getAlpha()/4));
+		sword.setX(this.getPositionX()-46+(float)(sword.getAlpha()/4));
+		sword.setY(this.getPositionY()-23+(float)(sword.getAlpha()/4));
 		
 	}
 	
