@@ -40,7 +40,7 @@ public class Hero implements IGameChars {
 	
 	
 	//Loads a SimpleSword
-	private SimpleSword sword;
+	public SimpleSword sword;
 	
 	public Hero(float x, float y) {
 		try {
@@ -122,10 +122,18 @@ public class Hero implements IGameChars {
 	
 	public void updateStrike(int spriteCount){
 		
-		sword.setAlpha(sword.getAlpha()+20);
-		sword.setImage( sword.rotateImage(sword.getImage(), sword.getAlpha()) );
-		sword.setX(this.getPositionX());
-		sword.setY(this.getPositionY());
+		sword.setAlpha(sword.getAlpha()+10);
+		sword.setImage( sword.rotateImage((int)sword.getAlpha()) );
+		sword.setX(this.getPositionX()-40+(float)(sword.getAlpha()/4));
+		sword.setY(this.getPositionY()-20+(float)(sword.getAlpha()/4));
+		
+		try {
+		    // retrieve image
+		    File outputfile = new File("swordMove_"+sword.getAlpha()+".png");
+		    ImageIO.write(sword.getImage(), "png", outputfile);
+		} catch (IOException e) {
+		   
+		}
 	}
 	
 	public Image getImage() {
@@ -146,8 +154,7 @@ public class Hero implements IGameChars {
 				this.resetStrike();
 				k = 0;
 				i = 0;
-				this.sword.setAlpha(0);
-				this.sword.setImageBack();
+				//this.sword.setImageBack();
 			}
 			return toImage(hero[i+15]);
 		}
