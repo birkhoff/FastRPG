@@ -127,13 +127,6 @@ public class Hero implements IGameChars {
 		sword.setX(this.getPositionX()-40+(float)(sword.getAlpha()/4));
 		sword.setY(this.getPositionY()-20+(float)(sword.getAlpha()/4));
 		
-		try {
-		    // retrieve image
-		    File outputfile = new File("swordMove_"+sword.getAlpha()+".png");
-		    ImageIO.write(sword.getImage(), "png", outputfile);
-		} catch (IOException e) {
-		   
-		}
 	}
 	
 	public Image getImage() {
