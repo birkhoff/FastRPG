@@ -19,6 +19,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.util.LinkedList;
 
 import javax.swing.JFrame;
@@ -120,7 +122,7 @@ public class GamePanel extends JFrame implements Runnable {
      */
     private void gameRender(Graphics2D gScr) {
         // Hintergrund faerben
-        gScr.setColor(Color.white);
+        gScr.setColor(Color.black);
         gScr.fillRect(0, 0, pWidth, pHeight);       
         gScr.setFont(font);
         gScr.setColor(Color.black);
@@ -137,7 +139,7 @@ public class GamePanel extends JFrame implements Runnable {
 			case RUN :
 				drawBackground(gScr);
 				drawHero(gScr);	// get ya hero on the screen!
-//				drawMobs(gScr);
+				drawMobs(gScr);
 				break;
 			case PAUSE :
 				break;
@@ -217,7 +219,7 @@ public class GamePanel extends JFrame implements Runnable {
         beforeTime = gameStartTime;
         running = true;
         hero = new Hero(mWidth/2, mHeight/2);	// create insane hero!
-        AssetCreator.getEnemiesFromMap(island);
+        AssetCreator.createAssets(island);
         while (running) {
             gameUpdate();
             screenUpdate();
@@ -339,13 +341,33 @@ public class GamePanel extends JFrame implements Runnable {
     		}
     	}
     }
+    static BufferedImage deepCopy(BufferedImage bi) {
+    	 ColorModel cm = bi.getColorModel();
+    	 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+    	 WritableRaster raster = bi.copyData(null);
+    	 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }
     private void drawBackground(Graphics2D g) {
     	if (state == State.RUN) {
     		// EXPERIMENTAL
-//    		BufferedImage foo = island.getDrawnMap();
-//    		drawMobs(foo.getGraphics());
-//    		g.drawImage(foo, getMapPosX(), getMapPosY(), null);
+//    		BufferedImage copy = island.getDrawnMap();
+    		
+    		
+//    		BufferedImage clone = deepCopy(copy);
+//    		BufferedImage clone = (BufferedImage) copy.clone();
+//    		Graphics2D copyG = (Graphics2D) copy.getGraphics();
+//    		drawMobs(copyG);
+    		
+    		
+    		
+    		
+    		
+    		
+    		
+    	
     		g.drawImage(island.getDrawnMap(), getMapPosX(), getMapPosY(), null);
+    		
+//    		foo.drawImage(foo, getMapPosX(), getMapPosY(), null);
     	
     		driftUp = false;
     		driftRight = false;
@@ -358,7 +380,7 @@ public class GamePanel extends JFrame implements Runnable {
     		LinkedList<Mob> Mobs = AssetCreator.getMobs();
     		for (int i = 0; i < Mobs.size(); i++) {
     			Mob mob = Mobs.get(i);
-    			g.drawImage(mob.getImage(), (int)mob.getPositionX(), (int)mob.getPositionY(), null);
+    			g.drawImage(mob.getImage(), (int)mob.getPositionX()+MapPosX, (int)mob.getPositionY()+MapPosY, null);
     		}
     	}
     }

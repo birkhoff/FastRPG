@@ -14,14 +14,31 @@ public class AssetCreator {
 	private static LinkedList<Mob> Mobs = new LinkedList<Mob>();
 	
 	public static void getEnemiesFromMap(Map island) {
-		Objectgroup group = island.getObjectGroup("mobs");
-		Entity[] entity = group.getObjetcs();
-		for (int i = 0; i < entity.length; i++) {
-			System.out.println("Entities: "+entity.length);
-			createEnemy(entity[i].getName(), entity[i].getX(), entity[i].getY());
+		if (island.getObjectGroup("mobs") != null) {
+			Objectgroup group = island.getObjectGroup("mobs");
+			Entity[] entity = group.getObjetcs();
+			for (int i = 0; i < entity.length; i++) {
+				System.out.println("Entities: "+entity.length);
+				createEnemy(entity[i].getName(), entity[i].getX(), entity[i].getY());
+			}
 		}
 	}
 	
+	public static void createAssets(Map island) {
+		getEnemiesFromMap(island);
+		getNPCSFromMap(island);
+	}
+	
+	public static void getNPCSFromMap(Map island) {
+		if (island.getObjectGroup("npcs") != null) {
+			Objectgroup group = island.getObjectGroup("npcs");
+			Entity[] entity = group.getObjetcs();
+			for (int i = 0; i < entity.length; i++) {
+				System.out.println("Entities: "+entity.length);
+				createEnemy(entity[i].getName(), entity[i].getX(), entity[i].getY());
+			}
+		}
+	}
 	public static void createEnemy(String name, float x, float y) {
 		Mobs.add(new Mob(name, x, y));
 	}
