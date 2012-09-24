@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import engine.AssetCreator;
+import gui.GamePanel;
 import interfaces.IGameChars;
 
 
@@ -15,8 +16,12 @@ public class Mob implements IGameChars {
 	private BufferedImage image;
 	private int hp;
 	private String name = "";
+	private int walkingCounter = 0;
 
 	private float stepsize = 3f;
+	private int look;
+	private int dirX;
+	private int dirY;
 	
 	public Mob(String name, float x, float y) {
 		this.name = name;
@@ -28,6 +33,7 @@ public class Mob implements IGameChars {
 		} catch (IOException e) {				
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
+		setLook((int) (Math.random()*4));
 		position = new float[2];
 		position[0] = x;
 		position[1] = y;
@@ -36,10 +42,31 @@ public class Mob implements IGameChars {
 	public Image toImage(BufferedImage bufferedImage) {
 	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
 	}
-	
-	public void walk() {
-		position[0] += (float) (Math.random()*stepsize);
-		position[1] += (float) (Math.random()*stepsize);
+	public void setLook(int i){
+		switch(i){
+			case 0: this.dirX = 0; this.dirY = -1;	 /*look.N; 	*/	break;
+			case 1: this.dirX = 1; this.dirY = 0;	/*look.E;	*/	break;
+			case 2: this.dirX = 0; this.dirY = 1;	/*look.S;	*/	break;
+			case 3: this.dirX = -1; this.dirY = 0;	/*look.W;	*/	break;
+		}
+	}
+	public void setLook() {
+		setLook((int) (Math.random()*4));
+	}
+	public int getWalkingCounter() {
+		return this.walkingCounter;
+	}
+	public void setWalkingCounter(int temp) {
+		this.walkingCounter = temp;
+	}
+	public int getDirX() {
+		return this.dirX;
+	}
+	public int getDirY() {
+		return this.dirY;
+	}
+	public int getLook(){
+		return this.look;
 	}
 	/******************* Getter und Setter ******************/
 	public float getPositionX() {
