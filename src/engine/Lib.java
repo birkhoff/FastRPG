@@ -3,7 +3,6 @@
  */
 
 package engine;
-import gui.GamePanel;
 import interfaces.*;
 
 public class Lib {

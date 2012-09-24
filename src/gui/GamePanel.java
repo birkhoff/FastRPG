@@ -80,13 +80,14 @@ public class GamePanel extends JFrame implements Runnable {
 	private Hero hero;
 	private Map island;
 	
-	//Action-Flags
+	// Action-Flags
 	private boolean drawActionButtonFlag = false;
 	private String conversationText = "Debug kills kittens";
 	private boolean drawConversation = false;
 	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
+	
 	/**
 	 * Kontruktor
 	 */
@@ -222,7 +223,10 @@ public class GamePanel extends JFrame implements Runnable {
     private void drawHero(Graphics2D g) {
     	if (state == State.RUN) {
     		g.drawImage(hero.getImage(), (int)hero.getPositionX(), (int)hero.getPositionY(), null);
-    		if(slash ){
+    		if(slash) {
+    			if (debugMode) {
+    				
+    			}
     			hero.updateStrike(1);
     			g.drawImage(hero.getSword().getImage(), (int)hero.getSword().getX(), (int)hero.getSword().getY(), null);
     			
@@ -244,6 +248,12 @@ public class GamePanel extends JFrame implements Runnable {
     		for (int i = 0; i < Mobs.size(); i++) {
     			Mob mob = Mobs.get(i);
     			g.drawImage(mob.getImage(), (int)mob.getPositionX()+MapPosX, (int)mob.getPositionY()+MapPosY, null);
+    			if (debugMode) {
+    				g.setColor(Color.red);
+    				g.drawString(""+mob.getHp(), (int)mob.getPositionX()+MapPosX, (int)mob.getPositionY()+MapPosY);
+    				g.setColor(Color.orange);
+    				g.fillRect((int)mob.getPositionX()+mob.getWidth()/2+MapPosX-5, (int)mob.getPositionY()+mob.getHeight()/2+MapPosY-5, 10, 10);
+    			}
     		}
     	}
     }

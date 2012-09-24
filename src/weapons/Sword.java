@@ -12,9 +12,7 @@ import javax.imageio.ImageIO;
 import chars.Mob;
 
 import engine.AssetCreator;
-import engine.Lib;
 import engine.Main;
-import gui.GamePanel;
 
 public abstract class Sword {
 
@@ -48,11 +46,11 @@ public abstract class Sword {
 		LinkedList<Mob> Mobs = AssetCreator.getMobs();
     	for (int i = 0; i < Mobs.size(); i++) {
 			Mob mob = Mobs.get(i);
-			float[] center = Lib.getCenter(mob);
-			if((x+epsilon-mapPosX > mob.getPositionX()+center[0] && x-epsilon-mapPosX < mob.getPositionX()+center[0]) &&
-					(x+epsilon-mapPosY > mob.getPositionY()+center[1] && x-epsilon-mapPosY < mob.getPositionY()+center[1])){
+			if(!mob.isHit() && (x+epsilon-mapPosX > mob.getPositionX()+mob.getWidth()/2 && x-epsilon-mapPosX < mob.getPositionX()+mob.getWidth()/2) &&
+					(y+epsilon-mapPosY > mob.getPositionY()+mob.getHeight()/2 && y-epsilon-mapPosY < mob.getPositionY()+mob.getHeight()/2)){
 				mob.setHp((int)(mob.getHp()-damage));
-				if (mob.getHp() < 0 ) {
+				mob.setHit(true);
+				if (mob.getHp() < 0) {
 					Mobs.remove(mob);
 				}
 			}
@@ -101,8 +99,7 @@ public abstract class Sword {
 	public BufferedImage getImage() {		
 		return image;
 	}
-		
-	public BufferedImage rotateImage( double degrees) {
+	public BufferedImage rotateImage(double degrees) {
 		checkHit();
 		AffineTransform transform = new AffineTransform();
 	    transform.rotate(Math.toRadians(-degrees), originalImage.getWidth()/2, originalImage.getHeight()*0.75);

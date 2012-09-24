@@ -15,7 +15,7 @@ public class Mob implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
 	private BufferedImage[] mob;
-	private int hp = 10;
+	private int hp = 500;
 	private String name = "";
 	private int walkingCounter = 0;
 	private int i = 0;
@@ -28,6 +28,7 @@ public class Mob implements IGameChars {
 	private int height;
 	private int rows;
 	private int cols;
+	private boolean hit;
 	
 	public Mob(String name, float x, float y) {
 		try {
@@ -159,5 +160,11 @@ public class Mob implements IGameChars {
 	}
 	public int getHeight() {
 		return height;
+	}
+	public boolean isHit() {
+		return hit;
+	}
+	public void setHit(boolean hit) {
+		this.hit = hit;
 	}
 }

@@ -10,7 +10,12 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+
 import javax.imageio.ImageIO;
+
+import engine.AssetCreator;
+import engine.Main;
 
 import weapons.SimpleSword;
 
@@ -57,10 +62,8 @@ public class Hero implements IGameChars {
 			hero = new BufferedImage[getRows() * getCols()];
 			sword = new SimpleSword();
 
-			for (int i = 0; i < getRows(); i++)
-			{
-			    for (int j = 0; j < getCols(); j++)
-			    {
+			for (int i = 0; i < getRows(); i++) {
+			    for (int j = 0; j < getCols(); j++) {
 			        hero[(i * getCols()) + j] = image.getSubimage(
 			            j * getWidth(),
 			            i * getHeight(),
@@ -69,15 +72,13 @@ public class Hero implements IGameChars {
 			        );
 			    }
 			}
-		} catch (IOException e) {				
+		} catch (IOException e) {
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
 		position = new float[2];
 		position[0] = x;
 		position[1] = y;
-		
 	}
-	
 	
 	public void slash(){
 		setSlash(true);
@@ -116,7 +117,7 @@ public class Hero implements IGameChars {
 	public void setPositionY(float position) {
 		this.position[1] = position;
 	}
-	public void updateStrike(int spriteCount){
+	public void updateStrike(int spriteCount) {
 		sword.setAlpha(sword.getAlpha()+10);
 		sword.setImage(sword.rotateImage((int)sword.getAlpha()));
 		sword.setX(this.getPositionX()-46+(float)(sword.getAlpha()/4));
@@ -137,6 +138,12 @@ public class Hero implements IGameChars {
 				this.setSlash(false);
 				this.setStepsize(getStepsize()*2);
 				this.resetStrike();
+				LinkedList<Mob> Mobs = AssetCreator.getMobs();
+				for (int i = 0; i < Mobs.size(); i++) {
+					Mob mob = Mobs.get(i);
+					mob.setHit(false);
+				}
+				
 				k = 0;
 				i = 0;
 				//this.sword.setImageBack();
