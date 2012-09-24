@@ -18,9 +18,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.util.LinkedList;
 
 import javax.swing.JFrame;
@@ -111,26 +108,15 @@ public class GamePanel extends JFrame implements Runnable {
     }
 
     /**
-     * Bevor das Spiel komplett beendet wird, werden noch diese Aufgaben ausgefuehrt
-     */
-    private void finishOff() {
-        if (!finishedOff) {
-            finishedOff = true;
-            restoreScreen();
-            System.exit(0);
-        }
-    }
-
-    /**
      * Menuehandling muss hier auch mit rein, da man auf die Graphics2D gScr 
      * zugreifen muss
      */
     private void gameRender(Graphics2D gScr) {
         // Hintergrund faerben
         gScr.setColor(Color.black);
-        gScr.fillRect(0, 0, pWidth, pHeight);       
+        gScr.fillRect(0, 0, pWidth, pHeight);    
         gScr.setFont(font);
-        gScr.setColor(Color.black);
+		gScr.setColor(Color.black);
     	switch(state) {
 			case INTRO :	
 				state = state.MENU;
@@ -152,24 +138,15 @@ public class GamePanel extends JFrame implements Runnable {
 				break;
     	}
     	if (debugMode) {
+    		gScr.setFont(font);
+    		gScr.setColor(Color.black);
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
 	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
-	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left+" slash: "+slash+" stepsize: "+hero.getStepsize()+" Sword-X: "+hero.getSword().getX()+" Sword-Y: "+hero.getSword().getY(), 20, 80);
-	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 100);
+	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left, 20, 80);
+	    	gScr.drawString("Sword: slash: "+slash+", x: "+hero.getSword().getX()+", y: "+hero.getSword().getY()+", damage: "+hero.getSword().getDamage(), 20, 100);
     	}
     }
-    
-    /**
-     * Gamethread starten
-     */
-    private void gameStart() {
-        if (animator == null || !running) {
-            animator = new Thread(this);
-            animator.start();
-        }
-    } 
-
     /**
      * Hauptmethode zur Aktualisierung des Spiels
      */
@@ -181,41 +158,10 @@ public class GamePanel extends JFrame implements Runnable {
         	LinkedList<Mob> Mobs = AssetCreator.getMobs();
         	for (int i = 0; i < Mobs.size(); i++) {
     			Mob mob = Mobs.get(i);
-    			mob.walk();
+    			moveMob(mob);
     		}
         }
     } 
-
-    /**
-     * Aktiviere Fullscreen
-     */
-    private void initFullScreen() {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        gd = ge.getDefaultScreenDevice();
-        setUndecorated(true);
-        setIgnoreRepaint(true);
-        setResizable(false);
-        if (!gd.isFullScreenSupported()) {
-            System.out.println("Vollbildmodus konnte nicht aktiviert werden!");
-            System.exit(0);
-        }
-        gd.setFullScreenWindow(this);
-        showCurrentMode();
-        pWidth = getBounds().width;
-        pHeight = getBounds().height;
-        setBufferStrategy();
-    }
-
-    /**
-     * Vollbildmodus verlassen und ggf. alte Aufloesung wiederherstellen
-     */
-    private void restoreScreen() {
-        Window w = gd.getFullScreenWindow();
-        if (w != null) {
-            w.dispose();
-        }
-        gd.setFullScreenWindow(null);
-    }
 
     public void run() {
         long beforeTime, afterTime, timeDiff, sleepTime;
@@ -257,29 +203,6 @@ public class GamePanel extends JFrame implements Runnable {
             }
         }
         finishOff();
-    } 
-
-    private void readyForTermination() {
-        addKeyListener(new KeyAdapter() {
-            // listen for esc, q, end, ctrl-c on the canvas to
-            // allow a convenient exit from the full screen configuration
-            public void keyPressed(KeyEvent e) {
-                int keyCode = e.getKeyCode();
-                if (keyCode == KeyEvent.VK_ESCAPE || keyCode == KeyEvent.VK_Q || keyCode == KeyEvent.VK_END || keyCode == KeyEvent.VK_C
-                        && e.isControlDown()) {
-                    running = false;
-                }
-            }
-        });
-        // for shutdown tasks
-        // a shutdown may not only come from the program
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                running = false;
-                finishOff();
-            }
-        });
     }
     
     private void screenUpdate() {
@@ -299,43 +222,7 @@ public class GamePanel extends JFrame implements Runnable {
         }
     }
 
-    private void setBufferStrategy() {
-        try {
-            EventQueue.invokeAndWait(new Runnable() {
-                public void run() {
-                    createBufferStrategy(NUM_BUFFERS);
-                }
-            });
-        } catch (Exception e) {
-            System.out.println("Buffer-Strategie konnte nicht angewendet werden.");
-            System.exit(0);
-        }
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException ex) {}
-        bufferStrategy = getBufferStrategy();
-    }
-
-    private void showCurrentMode() {
-        DisplayMode dm = gd.getDisplayMode();
-        mWidth = dm.getWidth();
-        mHeight = dm.getHeight();
-        System.out.println("Display Modus: (" + mWidth + "," + mHeight + "," + dm.getBitDepth() + "," + dm.getRefreshRate()+")  ");
-    }
     
-    public static void setPositionInMainMenu(int pos) {
-    	positionInMainMenu = pos;
-    }
-    
-    private void countFPS() {
-    	frames++;
-    	currentFrame = System.currentTimeMillis();
-    	if(currentFrame > firstFrame + 1000){
-    		firstFrame = currentFrame;
-    		fps = frames;
-    		frames = 0;
-    	}
-    }
     
     /******************** Draw Methoden *********************/
     private void drawHero(Graphics2D g) {
@@ -348,34 +235,9 @@ public class GamePanel extends JFrame implements Runnable {
     		}
     	}
     }
-    static BufferedImage deepCopy(BufferedImage bi) {
-    	 ColorModel cm = bi.getColorModel();
-    	 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-    	 WritableRaster raster = bi.copyData(null);
-    	 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    }
     private void drawBackground(Graphics2D g) {
     	if (state == State.RUN) {
-    		// EXPERIMENTAL
-//    		BufferedImage copy = island.getDrawnMap();
-    		
-    		
-//    		BufferedImage clone = deepCopy(copy);
-//    		BufferedImage clone = (BufferedImage) copy.clone();
-//    		Graphics2D copyG = (Graphics2D) copy.getGraphics();
-//    		drawMobs(copyG);
-    		
-    		
-    		
-    		
-    		
-    		
-    		
-    	
     		g.drawImage(island.getDrawnMap(), getMapPosX(), getMapPosY(), null);
-    		
-//    		foo.drawImage(foo, getMapPosX(), getMapPosY(), null);
-    	
     		driftUp = false;
     		driftRight = false;
     		driftDown = false;
@@ -638,18 +500,133 @@ public class GamePanel extends JFrame implements Runnable {
 			} 
 		}
     }
-    public int getMapPosX() {
-		return MapPosX;
+    
+    /**
+     * Move the Gumba
+     */
+	private void moveMob(Mob mob) {
+		if (mob.getWalkingCounter() < 32) {
+			if (!island.isSolid((int)(mob.getPositionX()+mob.getStepsize()*mob.getDirX()), (int)(mob.getPositionY()+mob.getStepsize()*mob.getDirY()))) {
+				mob.setPositionX(mob.getPositionX()+mob.getStepsize()*mob.getDirX());
+				mob.setPositionY(mob.getPositionY()+mob.getStepsize()*mob.getDirY());
+			}
+			mob.setWalkingCounter(mob.getWalkingCounter()+1);
+		} else {
+			mob.setLook();
+			mob.setWalkingCounter(0);
+		}
 	}
-	public void setMapPosX(int bgPosX) {
-		this.MapPosX = bgPosX;
-	}
-	public int getMapPosY() {
-		return MapPosY;
-	}
-	public void setMapPosY(int mapPosY) {
-		MapPosY = mapPosY;
-	}
+	
+	/********************************* Bisschen aufraeumen *********************************/
+	
+    /**
+     * Aktiviere Fullscreen
+     */
+    private void initFullScreen() {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        gd = ge.getDefaultScreenDevice();
+        setUndecorated(true);
+        setIgnoreRepaint(true);
+        setResizable(false);
+        if (!gd.isFullScreenSupported()) {
+            System.out.println("Vollbildmodus konnte nicht aktiviert werden!");
+            System.exit(0);
+        }
+        gd.setFullScreenWindow(this);
+        showCurrentMode();
+        pWidth = getBounds().width;
+        pHeight = getBounds().height;
+        setBufferStrategy();
+    }
+
+    private void readyForTermination() {
+        addKeyListener(new KeyAdapter() {
+            // listen for esc, q, end, ctrl-c on the canvas to
+            // allow a convenient exit from the full screen configuration
+            public void keyPressed(KeyEvent e) {
+                int keyCode = e.getKeyCode();
+                if (keyCode == KeyEvent.VK_ESCAPE || keyCode == KeyEvent.VK_Q || keyCode == KeyEvent.VK_END || keyCode == KeyEvent.VK_C
+                        && e.isControlDown()) {
+                    running = false;
+                }
+            }
+        });
+        // for shutdown tasks
+        // a shutdown may not only come from the program
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                running = false;
+                finishOff();
+            }
+        });
+    }
+    /**
+     * Bevor das Spiel komplett beendet wird, werden noch diese Aufgaben ausgefuehrt
+     */
+    private void finishOff() {
+        if (!finishedOff) {
+            finishedOff = true;
+            restoreScreen();
+            System.exit(0);
+        }
+    }
+    /**
+     * Gamethread starten
+     */
+    private void gameStart() {
+        if (animator == null || !running) {
+            animator = new Thread(this);
+            animator.start();
+        }
+    } 
+    /**
+     * Vollbildmodus verlassen und ggf. alte Aufloesung wiederherstellen
+     */
+    private void restoreScreen() {
+        Window w = gd.getFullScreenWindow();
+        if (w != null) {
+            w.dispose();
+        }
+        gd.setFullScreenWindow(null);
+    }
+    private void setBufferStrategy() {
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+                public void run() {
+                    createBufferStrategy(NUM_BUFFERS);
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("Buffer-Strategie konnte nicht angewendet werden.");
+            System.exit(0);
+        }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ex) {}
+        bufferStrategy = getBufferStrategy();
+    }
+
+    private void showCurrentMode() {
+        DisplayMode dm = gd.getDisplayMode();
+        mWidth = dm.getWidth();
+        mHeight = dm.getHeight();
+        System.out.println("Display Modus: (" + mWidth + "," + mHeight + "," + dm.getBitDepth() + "," + dm.getRefreshRate()+")  ");
+    }
+    
+    public static void setPositionInMainMenu(int pos) {
+    	positionInMainMenu = pos;
+    }
+    
+    private void countFPS() {
+    	frames++;
+    	currentFrame = System.currentTimeMillis();
+    	if(currentFrame > firstFrame + 1000){
+    		firstFrame = currentFrame;
+    		fps = frames;
+    		frames = 0;
+    	}
+    }
 	
 	//do this if Action Button is pushed
 	private void pressAction(){
@@ -687,13 +664,11 @@ public class GamePanel extends JFrame implements Runnable {
     			hero.setStepsize(hero.getStepsize()*10);
     		}
     		
-    		
     		if (state == State.RUN) {
     			if(drawConversation && e.getKeyCode() == KeyEvent.VK_F) {drawConversation = false; } 
     			else if(drawActionButtonFlag && e.getKeyCode() == KeyEvent.VK_F){
     				pressAction();
     			}
-    			
 	    		switch (e.getKeyCode()) {
 	    			case 37: left = true; break;
 	    			case 38: up = true; break;
@@ -702,7 +677,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    			case KeyEvent.VK_SPACE : 
 	    				if(slash){
 	    					hero.addStrike();
-	    				}else{
+	    				} else {
 	    					initSlash = true; 
 	    					hero.sword.setAlpha(40); //resets the angle of the sword
 	    				}
@@ -727,4 +702,16 @@ public class GamePanel extends JFrame implements Runnable {
 		@Override
 		public void keyTyped(KeyEvent e) {}
     }
+    public int getMapPosX() {
+		return MapPosX;
+	}
+	public void setMapPosX(int bgPosX) {
+		this.MapPosX = bgPosX;
+	}
+	public int getMapPosY() {
+		return MapPosY;
+	}
+	public void setMapPosY(int mapPosY) {
+		MapPosY = mapPosY;
+	}
 }
