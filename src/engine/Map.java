@@ -272,7 +272,10 @@ public class Map implements IGameObject{
 	public boolean isSolid(int x, int y) {
 		int newx = (x/this.getTileWidth());
 		int newy = (y/this.getTileHeight());
-		return collision[newx][newy];
+		if(collision.length < newx && collision[newx].length < newy){
+			return collision[newx][newy];
+		}
+		return false;
 	}
 	
 	//*************** End of Getter **************************//
