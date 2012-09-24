@@ -89,6 +89,11 @@ public class GamePanel extends JFrame implements Runnable {
 	private String conversationText = "Debug kills kittens";
 	private boolean drawConversation = false;
 	
+	//Rolling!
+	private boolean roll = false;
+	private float pixelsrolled = 0;
+	private float oldstepsize = 3f;
+	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
 	/**
@@ -348,10 +353,11 @@ public class GamePanel extends JFrame implements Runnable {
     private void moveHero() {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
+			hero.regenerateStamina();
 			boolean gone = false;		
 			drawActionButtonFlag = false;
 			
-			if(up || down || right || left){
+			if(up || down || right || left || roll){
 				hero.setStanding(false);
 			} else {
 				hero.setStanding(true);
@@ -367,7 +373,21 @@ public class GamePanel extends JFrame implements Runnable {
 				slash = hero.isSlash();
 
 			}
-
+			//Save the original stepsize
+			if ( (up || down || right || left) && roll && pixelsrolled == 0){
+				oldstepsize = hero.getStepsize();
+				hero.setStepsize(hero.getStepsize()*3);
+			}
+			
+			if ( (up || down || right || left) && roll && pixelsrolled < 100){
+				pixelsrolled += hero.getStepsize();
+			} else if (roll && pixelsrolled >= 100){
+				System.out.println("Schluss mit rollen");
+				roll = false;
+				hero.setStepsize(oldstepsize);
+				pixelsrolled = 0;
+			}
+			
 			if (up && right) {
     			if (driftUp && driftRight) {}
     			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth() &&
@@ -702,6 +722,13 @@ public class GamePanel extends JFrame implements Runnable {
 	    				}
 	    				break;
 	    			case KeyEvent.VK_P: loadMap("maps/map1.tmx"); break;
+	    			case KeyEvent.VK_V: 
+	    				if(hero.getStamina() >=0.5f && !roll){
+	    					roll = true; 
+	    					hero.loseStamina(0.5f);
+	    					System.out.println(hero.getStamina());
+	    				}
+	    				break;
 	    			default: break;
 	    		}
         	}
