@@ -6,7 +6,6 @@
 package engine;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import chars.Mob;
 import chars.NPC;

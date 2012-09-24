@@ -152,7 +152,7 @@ public class Hero implements IGameChars {
 		}
 		//Get Front Moving Sprites
 		if(this.getLook()==4 || this.getLook()==5 || this.getLook()==6){
-			if(k>1){
+			if(k>3){
 				i=i+1;
 				k = 0;
 			}
@@ -163,7 +163,7 @@ public class Hero implements IGameChars {
 		
 		//Get Back Moving Sprites
 		if(this.getLook()==7 || this.getLook()==0 || this.getLook()==1){
-			if(k>1){
+			if(k>3){
 				i=i+1;
 				k = 0;
 			}

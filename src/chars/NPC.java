@@ -22,7 +22,6 @@ public class NPC {
 	public NPC(String name, float x, float y) {
 		this.name = name;
 		try {
-			System.out.println("Male einen NPC");
 			setImage(ImageIO.read(new File("images/sprites/npcs/"+name+".png")));
 			BufferedReader in = new BufferedReader(new FileReader("chars/"+name+"/conversation.txt"));
 			conversation = in.readLine();

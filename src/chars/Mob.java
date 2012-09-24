@@ -6,42 +6,77 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+
 import engine.AssetCreator;
-import gui.GamePanel;
 import interfaces.IGameChars;
 
 
 public class Mob implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
-	private int hp;
+	private BufferedImage[] mob;
+	private int hp = 10;
 	private String name = "";
 	private int walkingCounter = 0;
-
-	private float stepsize = 2f;
+	private int i = 0;
+	private int k = 10;
+	private float stepsize = 1f;
 	private int look;
 	private int dirX;
 	private int dirY;
+	private int width;
+	private int height;
+	private int rows;
+	private int cols;
 	
 	public Mob(String name, float x, float y) {
-		this.name = name;
 		try {
-			if (name.equals("gumba")) {
-				System.out.println("Male einen Gumba");
-				setImage(ImageIO.read(new File("images/sprites/mobs/"+name+".png")));
+			this.name = name;
+			image = ImageIO.read(new File("images/sprites/mobs/skelett.png"));
+			setWidth(107);
+			setHeight(100);
+			setRows(10);
+			setCols(1);
+			mob = new BufferedImage[getRows() * getCols()];
+			for (int i = 0; i < getRows(); i++) {
+			    for (int j = 0; j < getCols(); j++) {
+			        mob[(i * getCols()) + j] = image.getSubimage(
+			            j * getWidth(),
+			            i * getHeight(),
+			            getWidth(),
+			            getHeight()
+			        );
+			    }
 			}
+			setLook((int) (Math.random()*4));
+			position = new float[2];
+			position[0] = x;
+			position[1] = y;
 		} catch (IOException e) {				
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
-		setLook((int) (Math.random()*4));
-		position = new float[2];
-		position[0] = x;
-		position[1] = y;
+	}
+	private int getCols() {
+		return cols;
+	}
+	private int getRows() {	
+		return rows;
+	}
+	private void setCols(int i) {
+		this.cols = i;
+	}
+	private void setRows(int i) {
+		this.rows = i;
+		
+	}
+	private void setHeight(int i) {
+		this.height = i;
+		
+	}
+	private void setWidth(int i) {
+		this.width = i;
 	}
 	
-	public Image toImage(BufferedImage bufferedImage) {
-	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
-	}
 	public void setLook(int i){
 		switch(i){
 			case 0: this.dirX = 0; this.dirY = -1;	 /*look.N; 	*/	break;
@@ -103,23 +138,26 @@ public class Mob implements IGameChars {
 		this.stepsize = stepsize;
 	}
 
-	public BufferedImage getImage() {
-		return image;
+	public Image getImage() {
+		if(k>1){
+			i=i+1;
+			k = 0;
+		}
+		i= i%10;
+		k+=1;
+		return toImage(mob[i]);		
 	}
-
+	public Image toImage(BufferedImage bufferedImage) {
+	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
+	}
 	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
 
-	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return width;
 	}
-
-	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return height;
 	}
 }
