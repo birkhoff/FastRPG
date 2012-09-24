@@ -212,7 +212,7 @@
 </data>
  </layer>
  <objectgroup name="mobs" width="100" height="100">
-  <object name="skelett" type="spawnpoint" x="611" y="348" width="50" height="50">
+  <object name="skelett" type="spawnpoint" x="611" y="348">
    <properties>
     <property name="bombe" value="jeehaa"/>
    </properties>

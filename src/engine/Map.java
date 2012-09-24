@@ -103,7 +103,6 @@ public class Map implements IGameObject{
 					tempEnt.setWidth(Integer.parseInt(entitys.get(j).getAttributeValue("width")));
 				tempEnt.setType(entitys.get(j).getAttributeValue("type"));
 				if(entitys.get(j).getChildren("properties").size() != 0){
-					System.out.println("Propartyyyys von ");
 					List<Element> properties = entitys.get(j).getChildren("properties");
 					Property[] tempProps = new Property[properties.get(0).getChildren("property").size()];
 					for(int k=0; k< tempProps.length; k++){
