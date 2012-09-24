@@ -41,7 +41,15 @@ public abstract class Sword {
 	private void checkHit() {
 		int epsilon = 10;	// Epsilon fuer Radius um Schwert
 		LinkedList<Mob> Mobs = AssetCreator.getMobs();
-		
+    	for (int i = 0; i < Mobs.size(); i++) {
+			Mob mob = Mobs.get(i);
+			if (x == mob.getPositionX() && y == mob.getPositionY()) {
+				mob.setHp((int)(mob.getHp()-damage));
+				if (mob.getHp() < 0 ) {
+					Mobs.remove(mob);
+				}
+			}
+		}
 	}
 	
 	public void setX(float x) {
@@ -88,7 +96,7 @@ public abstract class Sword {
 	}
 		
 	public BufferedImage rotateImage( double degrees) {
-		
+		checkHit();
 		AffineTransform transform = new AffineTransform();
 	    transform.rotate(Math.toRadians(-degrees), originalImage.getWidth()/2, originalImage.getHeight()*0.75);
 	    AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
