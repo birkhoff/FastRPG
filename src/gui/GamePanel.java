@@ -18,8 +18,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import chars.*;
 import engine.*;
@@ -85,6 +89,11 @@ public class GamePanel extends JFrame implements Runnable {
 	private String conversationText = "Debug kills kittens";
 	private boolean drawConversation = false;
 	
+	//Rolling!
+	private boolean roll = false;
+	private float pixelsrolled = 0;
+	private float oldstepsize = 3f;
+	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
 	
@@ -97,7 +106,17 @@ public class GamePanel extends JFrame implements Runnable {
         this.period = period;
         initFullScreen();
         readyForTermination();
-        island = new Map("maps/TestMap1.tmx");
+        loadMap("maps/TestMap1.tmx");
+        gameStart();
+    }
+    
+    public GamePanel(long period, String pathToTMX){
+    	super("Insane Engine!");
+        addKeyListener(new GameListener());
+        this.period = period;
+        initFullScreen();
+        readyForTermination();
+        loadMap(pathToTMX);
         gameStart();
     }
 
@@ -120,6 +139,16 @@ public class GamePanel extends JFrame implements Runnable {
 				state = state.RUN;
 				break;
 			case LOADLEVEL : 
+				gScr.setColor(Color.RED);
+				gScr.fillRect(0, 0, pWidth, pHeight);
+				BufferedImage foo = null;
+				try {
+					foo = ImageIO.read(new File("images/angela_merkel.jpg"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				gScr.drawImage(foo, 400, 400, null);
 				break;
 			case RUN :
 				drawBackground(gScr);
@@ -167,7 +196,6 @@ public class GamePanel extends JFrame implements Runnable {
         beforeTime = gameStartTime;
         running = true;
         hero = new Hero(mWidth/2, mHeight/2);	// create insane hero!
-        AssetCreator.createAssets(island);
         while (running) {
             gameUpdate();
             screenUpdate();
@@ -335,10 +363,11 @@ public class GamePanel extends JFrame implements Runnable {
     private void moveHero() {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
+			hero.regenerateStamina();
 			boolean gone = false;		
 			drawActionButtonFlag = false;
 			
-			if(up || down || right || left){
+			if(up || down || right || left || roll){
 				hero.setStanding(false);
 			} else {
 				hero.setStanding(true);
@@ -354,7 +383,21 @@ public class GamePanel extends JFrame implements Runnable {
 				slash = hero.isSlash();
 
 			}
-
+			//Save the original stepsize
+			if ( (up || down || right || left) && roll && pixelsrolled == 0){
+				oldstepsize = hero.getStepsize();
+				hero.setStepsize(hero.getStepsize()*3);
+			}
+			
+			if ( (up || down || right || left) && roll && pixelsrolled < 100){
+				pixelsrolled += hero.getStepsize();
+			} else if (roll && pixelsrolled >= 100){
+				System.out.println("Schluss mit rollen");
+				roll = false;
+				hero.setStepsize(oldstepsize);
+				pixelsrolled = 0;
+			}
+			
 			if (up && right) {
     			if (driftUp && driftRight) {}
     			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth() &&
@@ -643,6 +686,13 @@ public class GamePanel extends JFrame implements Runnable {
 		conversationText = actionNPC.getText(0);
 		drawConversation = true;
 	}
+	
+	private void loadMap(String path /* to .TMX mapfile */){
+		state = State.LOADLEVEL;
+		island = new Map(path);
+		AssetCreator.createAssets(island);
+		state = State.RUN;
+	}
 	/**
      * Alles moegliche, um Tastatureingaben zu lesen. 
      */
@@ -679,6 +729,14 @@ public class GamePanel extends JFrame implements Runnable {
 	    				} else {
 	    					initSlash = true; 
 	    					hero.sword.setAlpha(40); //resets the angle of the sword
+	    				}
+	    				break;
+	    			case KeyEvent.VK_P: loadMap("maps/map1.tmx"); break;
+	    			case KeyEvent.VK_V: 
+	    				if(hero.getStamina() >=0.5f && !roll){
+	    					roll = true; 
+	    					hero.loseStamina(0.5f);
+	    					System.out.println(hero.getStamina());
 	    				}
 	    				break;
 	    			default: break;

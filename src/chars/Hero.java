@@ -42,6 +42,7 @@ public class Hero implements IGameChars {
 	private int maxSlash;
 	private boolean standing;
 	private int look;
+	private float stamina = 1f;
 	
 	
 	//Loads a SimpleSword
@@ -261,5 +262,18 @@ public class Hero implements IGameChars {
 	}
 	public SimpleSword getSword() {
 		return sword;
+	}
+	
+	public float getStamina(){
+		return stamina;
+	}
+	
+	public void regenerateStamina(){
+		if (stamina < 1f)
+			stamina += 0.015f;
+	}
+	
+	public void loseStamina(float loss){
+		stamina -= loss;
 	}
 }
