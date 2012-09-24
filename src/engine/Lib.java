@@ -3,11 +3,12 @@
  */
 
 package engine;
+import gui.GamePanel;
 import interfaces.*;
 
 public class Lib {
 	/**
-	 * 
+	 * Calculate the center of a drawn object
 	 */
 	public static float[] getCenter(IGameChars obj) {
 		float[] center = new float[2];

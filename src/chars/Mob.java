@@ -7,9 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-import weapons.SimpleSword;
 import engine.AssetCreator;
-import gui.GamePanel;
 import interfaces.IGameChars;
 
 
@@ -17,12 +15,12 @@ public class Mob implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
 	private BufferedImage[] mob;
-	private int hp;
+	private int hp = 10;
 	private String name = "";
 	private int walkingCounter = 0;
 	private int i = 0;
-	private int k = 0;
-	private float stepsize = 2f;
+	private int k = 10;
+	private float stepsize = 1f;
 	private int look;
 	private int dirX;
 	private int dirY;
@@ -39,9 +37,7 @@ public class Mob implements IGameChars {
 			setHeight(100);
 			setRows(10);
 			setCols(1);
-	
 			mob = new BufferedImage[getRows() * getCols()];
-	
 			for (int i = 0; i < getRows(); i++) {
 			    for (int j = 0; j < getCols(); j++) {
 			        mob[(i * getCols()) + j] = image.getSubimage(
@@ -80,20 +76,6 @@ public class Mob implements IGameChars {
 	private void setWidth(int i) {
 		this.width = i;
 	}
-	
-//		try {
-//			if (name.equals("gumba")) {
-//				System.out.println("Male einen Gumba");
-//				setImage(ImageIO.read(new File("images/sprites/mobs/"+name+".png")));
-//			}
-//		} catch (IOException e) {				
-//			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
-//		}
-//		setLook((int) (Math.random()*4));
-//		position = new float[2];
-//		position[0] = x;
-//		position[1] = y;
-//	}
 	
 	public void setLook(int i){
 		switch(i){

@@ -35,14 +35,7 @@ public class GamePanel extends JFrame implements Runnable {
     private static int MAX_FRAME_SKIPS = 5; // was 2;
     private static final int NO_DELAYS_PER_YIELD = 16;
     private static final int NUM_BUFFERS = 2;
-    private static int DEFAULT_FPS = 100;
     private static final long serialVersionUID = 7773333380423469665L;
-
-    public static void main(String args[]) {
-    	int fps = DEFAULT_FPS;
-    	long period = (long) 1000.0 / fps;
-        new GamePanel(period * 1000000L);
-    }
 
     private Thread animator; // start thread who handles the animation
     private BufferStrategy bufferStrategy;
@@ -125,7 +118,7 @@ public class GamePanel extends JFrame implements Runnable {
 				new menu.MainMenu(gScr, positionInMainMenu, mWidth, mHeight);
 				state = state.RUN;
 				break;
-			case LOADLEVEL: 
+			case LOADLEVEL : 
 				break;
 			case RUN :
 				drawBackground(gScr);
@@ -145,6 +138,7 @@ public class GamePanel extends JFrame implements Runnable {
 	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
 	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left, 20, 80);
 	    	gScr.drawString("Sword: slash: "+slash+", x: "+hero.getSword().getX()+", y: "+hero.getSword().getY()+", damage: "+hero.getSword().getDamage(), 20, 100);
+	    	gScr.drawString("Turbomode: "+turboMode, 20, 120);
     	}
     }
     /**
@@ -334,14 +328,9 @@ public class GamePanel extends JFrame implements Runnable {
 			boolean gone = false;		
 			drawActionButtonFlag = false;
 			
-
-			// Catch Up n Down + Left n Right
-			if (left && right) left = false;
-			if (up && down) up = false;
-			
 			if(up || down || right || left){
 				hero.setStanding(false);
-			}else{
+			} else {
 				hero.setStanding(true);
 			}
 			

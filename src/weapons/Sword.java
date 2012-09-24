@@ -12,6 +12,9 @@ import javax.imageio.ImageIO;
 import chars.Mob;
 
 import engine.AssetCreator;
+import engine.Lib;
+import engine.Main;
+import gui.GamePanel;
 
 public abstract class Sword {
 
@@ -39,11 +42,15 @@ public abstract class Sword {
 	}
 
 	private void checkHit() {
-		int epsilon = 10;	// Epsilon fuer Radius um Schwert
+		int mapPosX = Main.getMapPosX();
+		int mapPosY = Main.getMapPosY();
+		int epsilon = 100;	// Epsilon fuer Radius um Schwerts
 		LinkedList<Mob> Mobs = AssetCreator.getMobs();
     	for (int i = 0; i < Mobs.size(); i++) {
 			Mob mob = Mobs.get(i);
-			if (x == mob.getPositionX() && y == mob.getPositionY()) {
+			float[] center = Lib.getCenter(mob);
+			if((x+epsilon-mapPosX > mob.getPositionX()+center[0] && x-epsilon-mapPosX < mob.getPositionX()+center[0]) &&
+					(x+epsilon-mapPosY > mob.getPositionY()+center[1] && x-epsilon-mapPosY < mob.getPositionY()+center[1])){
 				mob.setHp((int)(mob.getHp()-damage));
 				if (mob.getHp() < 0 ) {
 					Mobs.remove(mob);
