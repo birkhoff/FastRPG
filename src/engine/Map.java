@@ -97,10 +97,13 @@ public class Map implements IGameObject{
 				int x = Integer.parseInt(entitys.get(j).getAttributeValue("x"));
 				int y = Integer.parseInt(entitys.get(j).getAttributeValue("y"));
 				Entity tempEnt = new Entity(name, x, y);
-				tempEnt.setHeight(Integer.parseInt(entitys.get(j).getAttributeValue("height")));
-				tempEnt.setWidth(Integer.parseInt(entitys.get(j).getAttributeValue("width")));
+				if(entitys.get(j).getAttributeValue("height") != null)
+					tempEnt.setHeight(Integer.parseInt(entitys.get(j).getAttributeValue("height")));
+				if(entitys.get(j).getAttributeValue("width") != null)
+					tempEnt.setWidth(Integer.parseInt(entitys.get(j).getAttributeValue("width")));
 				tempEnt.setType(entitys.get(j).getAttributeValue("type"));
-				if(entitys.get(j).getChildren("properties") != null){
+				if(entitys.get(j).getChildren("properties").size() != 0){
+					System.out.println("Propartyyyys von ");
 					List<Element> properties = entitys.get(j).getChildren("properties");
 					Property[] tempProps = new Property[properties.get(0).getChildren("property").size()];
 					for(int k=0; k< tempProps.length; k++){
