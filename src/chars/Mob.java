@@ -18,7 +18,7 @@ public class Mob implements IGameChars {
 	private String name = "";
 	private int walkingCounter = 0;
 
-	private float stepsize = 3f;
+	private float stepsize = 2f;
 	private int look;
 	private int dirX;
 	private int dirY;

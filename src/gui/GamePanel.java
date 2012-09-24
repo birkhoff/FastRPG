@@ -87,6 +87,9 @@ public class GamePanel extends JFrame implements Runnable {
 	private Hero hero;
 	private Map island;
 	
+	//Draw-Flags
+	private boolean drawActionButtonFlag = false;
+	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
 	/**
@@ -109,9 +112,9 @@ public class GamePanel extends JFrame implements Runnable {
     private void gameRender(Graphics2D gScr) {
         // Hintergrund faerben
         gScr.setColor(Color.black);
-        gScr.fillRect(0, 0, pWidth, pHeight);       
+        gScr.fillRect(0, 0, pWidth, pHeight);    
         gScr.setFont(font);
-        gScr.setColor(Color.black);
+		gScr.setColor(Color.black);
     	switch(state) {
 			case INTRO :	
 				state = state.MENU;
@@ -126,16 +129,20 @@ public class GamePanel extends JFrame implements Runnable {
 				drawBackground(gScr);
 				drawHero(gScr);	// get ya hero on the screen!
 				drawMobs(gScr);
+				drawNPCs(gScr);
+				drawHUD(gScr);
 				break;
 			case PAUSE :
 				break;
     	}
     	if (debugMode) {
+    		gScr.setFont(font);
+    		gScr.setColor(Color.black);
 	    	gScr.drawString("FPS: "+fps, 20, 20);
 	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
 	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
-	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left+" slash: "+slash+" stepsize: "+hero.getStepsize()+" Sword-X: "+hero.getSword().getX()+" Sword-Y: "+hero.getSword().getY(), 20, 80);
-	    	gScr.drawString("TurboMode (SHIFT) = "+turboMode, 20, 100);
+	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left, 20, 80);
+	    	gScr.drawString("Sword: slash: "+slash+", x: "+hero.getSword().getX()+", y: "+hero.getSword().getY()+", damage: "+hero.getSword().getDamage(), 20, 100);
     	}
     }
     /**
@@ -244,6 +251,25 @@ public class GamePanel extends JFrame implements Runnable {
     		}
     	}
     }
+    
+    private void drawNPCs(Graphics g){
+    	if (state == State.RUN) {
+    		LinkedList<NPC> npcs = AssetCreator.getNPCs();
+    		for(int i=0; i< npcs.size(); i++){
+    			NPC npc = npcs.get(i);
+    			g.drawImage(npc.getImage(), (int)npc.getPositionX()+MapPosX, (int)npc.getPositionY()+MapPosY, null);
+    		}
+    	}
+    }
+    
+    private void drawHUD(Graphics g){
+    	if(drawActionButtonFlag){
+    		g.setColor(Color.WHITE);
+    		g.fillRect((int)hero.getPositionX()-80, (int)hero.getPositionY()+65, 100, 25);
+    		g.setColor(Color.BLACK);
+    		g.drawString("Action   [F]", (int)hero.getPositionX()-70, (int)hero.getPositionY()+85);
+    	}
+    }
     /******************** /Draw Methoden/ *********************/
     /**
      * Soll den Untergrund verschieben, wenn der Held an die Kante
@@ -298,6 +324,7 @@ public class GamePanel extends JFrame implements Runnable {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
 			boolean gone = false;		
+			drawActionButtonFlag = false;
 			
 
 			// Catch Up n Down + Left n Right
@@ -455,26 +482,32 @@ public class GamePanel extends JFrame implements Runnable {
     			hero.setLook(6);
     			}
     	}
+		
+		LinkedList<NPC> npcs = AssetCreator.getNPCs();
+		for(int i=0; i<npcs.size(); i++){
+			NPC npc = npcs.get(i);
+			if((npc.getPositionX()+200 > hero.getPositionX()-MapPosX && npc.getPositionX()-150 < hero.getPositionX()-MapPosX) &&
+					(npc.getPositionY()+200 >hero.getPositionY()-MapPosY && npc.getPositionY()-150 < hero.getPositionY()-MapPosY)){
+				drawActionButtonFlag = true;
+			} 
+		}
     }
     
     /**
      * Move the Gumba
      */
 	private void moveMob(Mob mob) {
-		if (mob.getWalkingCounter() < 16) {
+		if (mob.getWalkingCounter() < 32) {
 			if (!island.isSolid((int)(mob.getPositionX()+mob.getStepsize()*mob.getDirX()), (int)(mob.getPositionY()+mob.getStepsize()*mob.getDirY()))) {
 				mob.setPositionX(mob.getPositionX()+mob.getStepsize()*mob.getDirX());
 				mob.setPositionY(mob.getPositionY()+mob.getStepsize()*mob.getDirY());
 			}
 			mob.setWalkingCounter(mob.getWalkingCounter()+1);
 		} else {
-			mob.setLook(3);
+			mob.setLook();
 			mob.setWalkingCounter(0);
 		}
 	}
-    public boolean isTileSafe(int x, int y) {
-    	return island.isSolid(x, y);
-    }
 	
 	/********************************* Bisschen aufraeumen *********************************/
 	
@@ -586,7 +619,17 @@ public class GamePanel extends JFrame implements Runnable {
     		frames = 0;
     	}
     }
-    
+	
+	//do this if Action Button is pushed
+	private void pressAction(){
+		LinkedList<NPC> npcs = AssetCreator.getNPCs();
+		float minDistance = Integer.MAX_VALUE;
+		NPC actionNPC = null;
+		for(int i = 0; i<npcs.size(); i++){
+			NPC npc = npcs.get(i);
+//			if(minDistance > Math.sqrt(npc.getPositionX()-(hero.getPositionX()-MapPosX)))
+		}
+	}
 	/**
      * Alles moegliche, um Tastatureingaben zu lesen. 
      */
@@ -608,6 +651,9 @@ public class GamePanel extends JFrame implements Runnable {
     		}
     		
     		if (state == State.RUN) {
+    			if(drawActionButtonFlag && e.getKeyCode() == KeyEvent.VK_F){
+    				pressAction();
+    			}
 	    		switch (e.getKeyCode()) {
 	    			case 37: left = true; break;
 	    			case 38: up = true; break;

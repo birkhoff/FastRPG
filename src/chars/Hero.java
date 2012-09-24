@@ -86,17 +86,14 @@ public class Hero implements IGameChars {
 		k=0;
 	}
 	
-	
-	public void addStrike(){
+	public void addStrike() {
 		int i = getNumberOfSlashSprites()+oneSlash;
 		if(i>=maxSlash) i = maxSlash;
 		this.setNumberOfSlashSprites(i);
 	}
-	
 	public void resetStrike(){
 		this.setNumberOfSlashSprites(oneSlash);
 	}
-	
 	public Image toImage(BufferedImage bufferedImage) {
 	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
 	}
@@ -119,18 +116,13 @@ public class Hero implements IGameChars {
 	public void setPositionY(float position) {
 		this.position[1] = position;
 	}
-	
 	public void updateStrike(int spriteCount){
-		
 		sword.setAlpha(sword.getAlpha()+10);
-		sword.setImage( sword.rotateImage((int)sword.getAlpha()) );
+		sword.setImage(sword.rotateImage((int)sword.getAlpha()));
 		sword.setX(this.getPositionX()-46+(float)(sword.getAlpha()/4));
 		sword.setY(this.getPositionY()-23+(float)(sword.getAlpha()/4));
-		
 	}
-	
 	public Image getImage() {
-		
 		// GET THE SLASHING SPRITES
 		if(isSlash()){		
 			if(k>1){
@@ -192,7 +184,6 @@ public class Hero implements IGameChars {
 			case 5: this.look = 5;	/*look.SW;	*/	break;
 			case 6: this.look = 6;	/*look.W;	*/	break;
 			case 7: this.look = 7;	/*look.NW;	*/	break;
-		
 		}
 	}
 	
@@ -240,35 +231,27 @@ public class Hero implements IGameChars {
 	public void setCols(int cols) {
 		this.cols = cols;
 	}
-
 	public void setSlash(boolean slash) {
 		this.slash = slash;
 	}
-
 	public boolean isSlash() {
 		return slash;
 	}
-
 	public void setNumberOfSlashSprites(int numberOfSlashSprites) {
 		this.numberOfSlashSprites = numberOfSlashSprites;
 	}
-
 	public int getNumberOfSlashSprites() {
 		return numberOfSlashSprites;
 	}
-
 	public void setStanding(boolean standing) {
 		this.standing = standing;
 	}
-
 	public boolean isStanding() {
 		return standing;
 	}
-
 	public void setSword(SimpleSword sword) {
 		this.sword = sword;
 	}
-
 	public SimpleSword getSword() {
 		return sword;
 	}
