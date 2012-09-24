@@ -1,6 +1,8 @@
 /bin
+HEAD
 .DS_Store
 /src/.DS_Store
 /lib/.DS_Store
 /maps/.DS_Store
 /images/.DS_Store
+swordMove*
