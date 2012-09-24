@@ -90,8 +90,10 @@ public class GamePanel extends JFrame implements Runnable {
 	private Hero hero;
 	private Map island;
 	
-	//Draw-Flags
+	//Action-Flags
 	private boolean drawActionButtonFlag = false;
+	private String conversationText = "Debug kills kittens";
+	private boolean drawConversation = false;
 	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
@@ -407,6 +409,12 @@ public class GamePanel extends JFrame implements Runnable {
     		g.setColor(Color.BLACK);
     		g.drawString("Action   [F]", (int)hero.getPositionX()-70, (int)hero.getPositionY()+85);
     	}
+    	if(drawConversation){
+    		g.setColor(Color.DARK_GRAY);
+    		g.fillRect(0, mHeight-100, mWidth, 100);
+    		g.setColor(Color.ORANGE);
+    		g.drawString(conversationText, 20, mHeight-80);
+    	}
     }
     /******************** /Draw Methoden/ *********************/
     /**
@@ -646,12 +654,18 @@ public class GamePanel extends JFrame implements Runnable {
 	//do this if Action Button is pushed
 	private void pressAction(){
 		LinkedList<NPC> npcs = AssetCreator.getNPCs();
-		float minDistance = Integer.MAX_VALUE;
+		double minDistance = Integer.MAX_VALUE;
 		NPC actionNPC = null;
+		//Calculate nearest NPC for Action-Button use
 		for(int i = 0; i<npcs.size(); i++){
 			NPC npc = npcs.get(i);
-//			if(minDistance > Math.sqrt(npc.getPositionX()-(hero.getPositionX()-MapPosX)))
+			if(minDistance > Math.sqrt(Math.pow(npc.getPositionX()-(hero.getPositionX()-MapPosX),2) + Math.pow(npc.getPositionY()-(hero.getPositionY()-MapPosY),2))){
+				minDistance = Math.sqrt(Math.pow(npc.getPositionX()-(hero.getPositionX()-MapPosX),2) + Math.pow(npc.getPositionY()-(hero.getPositionY()-MapPosY),2));
+				actionNPC = npc;
+			}
 		}
+		conversationText = actionNPC.getText(0);
+		drawConversation = true;
 	}
 	/**
      * Alles moegliche, um Tastatureingaben zu lesen. 
@@ -675,7 +689,8 @@ public class GamePanel extends JFrame implements Runnable {
     		
     		
     		if (state == State.RUN) {
-    			if(drawActionButtonFlag && e.getKeyCode() == KeyEvent.VK_F){
+    			if(drawConversation && e.getKeyCode() == KeyEvent.VK_F) {drawConversation = false; } 
+    			else if(drawActionButtonFlag && e.getKeyCode() == KeyEvent.VK_F){
     				pressAction();
     			}
     			
