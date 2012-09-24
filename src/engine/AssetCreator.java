@@ -16,7 +16,12 @@ public class AssetCreator {
 	private static LinkedList<Mob> Mobs = new LinkedList<Mob>();
 	private static LinkedList<NPC> NPCs = new LinkedList<NPC>();
 	
-	public static void getEnemiesFromMap(Map island) {
+	public static void createAssets(Map island) {
+		getEnemiesFromMap(island);
+		getNPCSFromMap(island);
+	}
+	
+	private static void getEnemiesFromMap(Map island) {
 		if (island.getObjectGroup("mobs") != null) {
 			Objectgroup group = island.getObjectGroup("mobs");
 			Entity[] entity = group.getObjetcs();
@@ -25,14 +30,9 @@ public class AssetCreator {
 				createEnemy(entity[i].getName(), entity[i].getX(), entity[i].getY());
 			}
 		}
-	}
+	}	
 	
-	public static void createAssets(Map island) {
-		getEnemiesFromMap(island);
-		getNPCSFromMap(island);
-	}
-	
-	public static void getNPCSFromMap(Map island) {
+	private static void getNPCSFromMap(Map island) {
 		if (island.getObjectGroup("npcs") != null) {
 			Objectgroup group = island.getObjectGroup("npcs");
 			Entity[] entity = group.getObjetcs();
@@ -42,10 +42,10 @@ public class AssetCreator {
 			}
 		}
 	}
-	public static void createEnemy(String name, float x, float y) {
+	private static void createEnemy(String name, float x, float y) {
 		Mobs.add(new Mob(name, x, y));
 	}
-	public static void createNPC(String name, float x, float y) {
+	private static void createNPC(String name, float x, float y) {
 		NPCs.add(new NPC(name, x, y));
 	}
 	public static void remove(Object obj) {
@@ -53,5 +53,8 @@ public class AssetCreator {
 	}
 	public static LinkedList<Mob> getMobs() {
 		return Mobs;
+	}
+	public static LinkedList<NPC> getNPCs() {
+		return NPCs;
 	}
 }
