@@ -19,7 +19,7 @@ public class NPC {
 	public NPC(String name, float x, float y) {
 		this.name = name;
 		try {
-			if (name.equals("Grumpy Old Man")) {
+			if (name.equals("Grumpy Old Dad")) {
 				System.out.println("Male einen NPC");
 				setImage(ImageIO.read(new File("images/sprites/npcs/"+name+".png")));
 			}
@@ -35,5 +35,17 @@ public class NPC {
 	}
 	public void setImage(BufferedImage image) {
 		this.image = image;
+	}
+	
+	public BufferedImage getImage(){
+		return image;
+	}
+	
+	public float getPositionX(){
+		return position[0];
+	}
+	
+	public float getPositionY(){
+		return position[1];
 	}
 }

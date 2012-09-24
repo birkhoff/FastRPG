@@ -90,6 +90,9 @@ public class GamePanel extends JFrame implements Runnable {
 	private Hero hero;
 	private Map island;
 	
+	//Draw-Flags
+	private boolean drawActionButtonFlag = false;
+	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
 	/**
@@ -140,6 +143,8 @@ public class GamePanel extends JFrame implements Runnable {
 				drawBackground(gScr);
 				drawHero(gScr);	// get ya hero on the screen!
 				drawMobs(gScr);
+				drawNPCs(gScr);
+				drawHUD(gScr);
 				break;
 			case PAUSE :
 				break;
@@ -384,6 +389,25 @@ public class GamePanel extends JFrame implements Runnable {
     		}
     	}
     }
+    
+    private void drawNPCs(Graphics g){
+    	if (state == State.RUN) {
+    		LinkedList<NPC> npcs = AssetCreator.getNPCs();
+    		for(int i=0; i< npcs.size(); i++){
+    			NPC npc = npcs.get(i);
+    			g.drawImage(npc.getImage(), (int)npc.getPositionX()+MapPosX, (int)npc.getPositionY()+MapPosY, null);
+    		}
+    	}
+    }
+    
+    private void drawHUD(Graphics g){
+    	if(drawActionButtonFlag){
+    		g.setColor(Color.WHITE);
+    		g.fillRect((int)hero.getPositionX()-80, (int)hero.getPositionY()+65, 100, 25);
+    		g.setColor(Color.BLACK);
+    		g.drawString("Action   [F]", (int)hero.getPositionX()-70, (int)hero.getPositionY()+85);
+    	}
+    }
     /******************** /Draw Methoden/ *********************/
     /**
      * Soll den Untergrund verschieben, wenn der Held an die Kante
@@ -438,6 +462,7 @@ public class GamePanel extends JFrame implements Runnable {
 		if (state == State.RUN) {
 			float step = hero.getStepsize();
 			boolean gone = false;		
+			drawActionButtonFlag = false;
 			
 
 			// Catch Up n Down + Left n Right
@@ -595,6 +620,15 @@ public class GamePanel extends JFrame implements Runnable {
     			hero.setLook(6);
     			}
     	}
+		
+		LinkedList<NPC> npcs = AssetCreator.getNPCs();
+		for(int i=0; i<npcs.size(); i++){
+			NPC npc = npcs.get(i);
+			if((npc.getPositionX()+200 > hero.getPositionX()-MapPosX && npc.getPositionX()-150 < hero.getPositionX()-MapPosX) &&
+					(npc.getPositionY()+200 >hero.getPositionY()-MapPosY && npc.getPositionY()-150 < hero.getPositionY()-MapPosY)){
+				drawActionButtonFlag = true;
+			} 
+		}
     }
     public int getMapPosX() {
 		return MapPosX;
@@ -607,6 +641,17 @@ public class GamePanel extends JFrame implements Runnable {
 	}
 	public void setMapPosY(int mapPosY) {
 		MapPosY = mapPosY;
+	}
+	
+	//do this if Action Button is pushed
+	private void pressAction(){
+		LinkedList<NPC> npcs = AssetCreator.getNPCs();
+		float minDistance = Integer.MAX_VALUE;
+		NPC actionNPC = null;
+		for(int i = 0; i<npcs.size(); i++){
+			NPC npc = npcs.get(i);
+//			if(minDistance > Math.sqrt(npc.getPositionX()-(hero.getPositionX()-MapPosX)))
+		}
 	}
 	/**
      * Alles moegliche, um Tastatureingaben zu lesen. 
@@ -628,7 +673,12 @@ public class GamePanel extends JFrame implements Runnable {
     			hero.setStepsize(hero.getStepsize()*10);
     		}
     		
+    		
     		if (state == State.RUN) {
+    			if(drawActionButtonFlag && e.getKeyCode() == KeyEvent.VK_F){
+    				pressAction();
+    			}
+    			
 	    		switch (e.getKeyCode()) {
 	    			case 37: left = true; break;
 	    			case 38: up = true; break;
