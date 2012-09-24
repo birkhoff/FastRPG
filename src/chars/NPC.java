@@ -3,7 +3,9 @@ package chars;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -13,16 +15,17 @@ public class NPC {
 	private BufferedImage image;
 	private int hp;
 	private String name = "";
+	private String conversation = "Lass uns Wildschweine jagen gehen";
 
 	private float stepsize = 3f;
 	
 	public NPC(String name, float x, float y) {
 		this.name = name;
 		try {
-			if (name.equals("Grumpy Old Dad")) {
-				System.out.println("Male einen NPC");
-				setImage(ImageIO.read(new File("images/sprites/npcs/"+name+".png")));
-			}
+			System.out.println("Male einen NPC");
+			setImage(ImageIO.read(new File("images/sprites/npcs/"+name+".png")));
+			BufferedReader in = new BufferedReader(new FileReader("chars/"+name+"/conversation.txt"));
+			conversation = in.readLine();
 		} catch (IOException e) {				
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
@@ -47,5 +50,13 @@ public class NPC {
 	
 	public float getPositionY(){
 		return position[1];
+	}
+	
+	public String getText(int number){
+		return conversation;
+	}
+	
+	protected void setText(String text){
+		this.conversation = text;
 	}
 }
