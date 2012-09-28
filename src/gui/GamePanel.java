@@ -187,7 +187,7 @@ public class GamePanel extends JFrame implements Runnable {
         }
     } 
 
-    public void run() {
+	public void run() {
         long beforeTime, afterTime, timeDiff, sleepTime;
         long overSleepTime = 0L;
         int noDelays = 0;
@@ -275,6 +275,7 @@ public class GamePanel extends JFrame implements Runnable {
     		LinkedList<Mob> Mobs = AssetCreator.getMobs();
     		for (int i = 0; i < Mobs.size(); i++) {
     			Mob mob = Mobs.get(i);
+    			mob.checkRange(hero);
     			g.drawImage(mob.getImage(), (int)mob.getPositionX()+MapPosX, (int)mob.getPositionY()+MapPosY, null);
     			if (debugMode) {
     				g.setColor(Color.red);
@@ -547,18 +548,41 @@ public class GamePanel extends JFrame implements Runnable {
      * Move the Gumba
      */
 	private void moveMob(Mob mob) {
-		if (mob.getWalkingCounter() < 32) {
-			if (!island.isSolid((int)(mob.getPositionX()+mob.getStepsize()*mob.getDirX()), (int)(mob.getPositionY()+mob.getStepsize()*mob.getDirY()))) {
-				mob.setPositionX(mob.getPositionX()+mob.getStepsize()*mob.getDirX());
-				mob.setPositionY(mob.getPositionY()+mob.getStepsize()*mob.getDirY());
-			}
-			mob.setWalkingCounter(mob.getWalkingCounter()+1);
+		mob.checkRange(hero);
+		if (mob.isHeroInRange()) {
+			attackHero(mob);
 		} else {
-			mob.setLook();
-			mob.setWalkingCounter(0);
+			if (mob.getWalkingCounter() < 32) {
+				if (!island.isSolid((int)(mob.getPositionX()+mob.getStepsize()*mob.getDirX()), (int)(mob.getPositionY()+mob.getStepsize()*mob.getDirY()))) {
+					mob.setPositionX(mob.getPositionX()+mob.getStepsize()*mob.getDirX());
+					mob.setPositionY(mob.getPositionY()+mob.getStepsize()*mob.getDirY());
+				}
+				mob.setWalkingCounter(mob.getWalkingCounter()+1);
+			} else {
+				mob.setLook();
+				mob.setWalkingCounter(0);
+			}
 		}
 	}
-	
+	/**
+	 * If the shiny hero is in range, ATTACK HIM!
+	 */
+    private void attackHero(Mob mob) {
+    	boolean check = mob.isDirectionForAttack();
+    	if (check) {
+    		if (mob.getPositionX()+MapPosX-hero.getPositionX() < 0)
+    			mob.setPositionX(mob.getPositionX()+mob.getStepsize());
+    		else
+    			mob.setPositionX(mob.getPositionX()-mob.getStepsize());
+    		mob.setDirectionForAttack(false);
+    	} else {
+    		if (mob.getPositionY()+MapPosY-hero.getPositionY() < 0)
+    			mob.setPositionY(mob.getPositionY()+mob.getStepsize());
+    		else
+    			mob.setPositionY(mob.getPositionY()-mob.getStepsize());
+    		mob.setDirectionForAttack(true);
+    	}
+	}
 	/********************************* Bisschen aufraeumen *********************************/
 	
     /**
