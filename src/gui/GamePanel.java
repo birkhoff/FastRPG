@@ -152,10 +152,10 @@ public class GamePanel extends JFrame implements Runnable {
 				break;
 			case RUN :
 				drawBackground(gScr);
-				drawHero(gScr);	// get ya hero on the screen!
 				drawMobs(gScr);
 				drawNPCs(gScr);
 				drawHUD(gScr);
+				drawHero(gScr);	// get ya hero on the screen!
 				break;
 			case PAUSE :
 				break;
@@ -252,13 +252,17 @@ public class GamePanel extends JFrame implements Runnable {
     	if (state == State.RUN) {
     		g.drawImage(hero.getImage(), (int)hero.getPositionX(), (int)hero.getPositionY(), null);
     		if(slash) {
-    			if (debugMode) {
-    				
-    			}
     			hero.updateStrike(1);
     			g.drawImage(hero.getSword().getImage(), (int)hero.getSword().getX(), (int)hero.getSword().getY(), null);
     			
     		}
+    		if (debugMode) {
+    			g.setColor(Color.BLACK);
+    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getHeight()*0.9), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getHeight()*0.9));
+    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)hero.getPositionY());
+    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.6), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getHeight()*0.9));
+				g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getHeight()*0.9));
+			}
     	}
     }
     private void drawBackground(Graphics2D g) {
@@ -318,23 +322,23 @@ public class GamePanel extends JFrame implements Runnable {
      */
     private void calcDrift() {
     	if (state == State.RUN) {
-    		float drift = 0.2f;		// Setze 20% Kante zum scrollen
+    		float drift = 0.25f;		// Setze 20% Kante zum scrollen
     		float[] center = Lib.getCenter(hero);
     		// Oberer und unterer Rand
     		if (hero.getPositionY() < mHeight*drift - center[1] && up &&
     							!island.isSolid((int)(hero.getPositionX()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.85-hero.getStepsize()-MapPosY)) &&
-    							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.85-hero.getStepsize()-MapPosY))) {
+    											(int)(hero.getPositionY()+hero.getHeight()*0.65-hero.getStepsize()-MapPosY)) &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.6),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.65-hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()+tolerance < 0) {
     				driftUp = true;
     				setMapPosY(getMapPosY() + (int) hero.getStepsize());	
     			}
     		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down &&
     							!island.isSolid((int)(hero.getPositionX()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.85+hero.getStepsize()-MapPosY)) &&
-								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),
-												(int)(hero.getPositionY()+hero.getHeight()*0.85+hero.getStepsize()-MapPosY))) {
+    											(int)(hero.getPositionY()+hero.getHeight()*0.65+hero.getStepsize()-MapPosY)) &&
+								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.6),
+												(int)(hero.getPositionY()+hero.getHeight()*0.65+hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()-tolerance >= (-1)*(island.getHeight()-mHeight)) {
     				driftDown = true;
     				setMapPosY(getMapPosY() + (int) ((-1)*hero.getStepsize()));
@@ -342,14 +346,14 @@ public class GamePanel extends JFrame implements Runnable {
     		} 
     		if (hero.getPositionX() < (mWidth*drift) - center[0] && left &&
     							!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.8-MapPosY))) {
+    											(int)(hero.getPositionY()+hero.getHeight()*0.6-MapPosY))) {
     			if (getMapPosX()+tolerance < 0) {
     				driftLeft = true;
     				setMapPosX(getMapPosX() + (int) hero.getStepsize());
     			}
     		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right &&
-    							!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()+hero.getWidth()*0.8-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.8-MapPosY))) {
+    							!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()+hero.getWidth()*0.6-MapPosX),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.6-MapPosY))) {
     			if (getMapPosX()-tolerance >= (-1)*(island.getWidth()-mWidth)) {
     				driftRight = true;
     				setMapPosX(getMapPosX() + (int) ((-1)*hero.getStepsize()));
@@ -402,132 +406,132 @@ public class GamePanel extends JFrame implements Runnable {
 			if (up && right) {
     			if (driftUp && driftRight) {}
     			else if (driftUp && hero.getPositionX() < mWidth-hero.getWidth() &&
-    					!island.isSolid((int)(hero.getPositionX()+step+hero.getWidth()*0.8-MapPosX),
-    									(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
+    					!island.isSolid((int)(hero.getPositionX()+step+hero.getWidth()*0.6-MapPosX),
+    									(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()+step);
     			} else if (driftRight && hero.getPositionY() > 0 &&
-    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
-										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY)) &&
-						!island.isSolid((int)(hero.getPositionX()-MapPosX),
-										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY))){
+    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6-MapPosX),
+										(int)(hero.getPositionY()-step+hero.getHeight()*0.9-MapPosY)) &&
+						!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+										(int)(hero.getPositionY()-step+hero.getHeight()*0.9-MapPosY))){
     				hero.setPositionY(hero.getPositionY()-step);
     			}  else if (!driftUp && !driftRight) {
     				float dia = (float) (Math.sqrt(2*(step*step))/2);
     				if (hero.getPositionX() <= mWidth-hero.getWidth() && 
-    					!island.isSolid((int)(hero.getPositionX()+dia+hero.getWidth()*0.8-MapPosX),
-    									(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) 
+    					!island.isSolid((int)(hero.getPositionX()+dia+hero.getWidth()*0.6-MapPosX),
+    									(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) 
     					hero.setPositionX(hero.getPositionX()+dia);
     				if (hero.getPositionY() > 0 && 
-    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
-    									(int)(hero.getPositionY()-dia+hero.getHeight()*0.85-MapPosY)) &&
-    					!island.isSolid((int)(hero.getPositionX()-MapPosX),
-    									(int)(hero.getPositionY()-dia+hero.getHeight()*0.85-MapPosY)))
+    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6-MapPosX),
+    									(int)(hero.getPositionY()-dia+hero.getHeight()*0.9-MapPosY)) &&
+    					!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+    									(int)(hero.getPositionY()-dia+hero.getHeight()*0.9-MapPosY)))
     					hero.setPositionY(hero.getPositionY()-dia);    				    				
     				gone = true;
     			}
     		} else if (right && down) {
     			if (driftRight && driftDown) {}
     			else if (driftRight && hero.getPositionY() < mHeight-hero.getHeight() &&
-    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
-										(int)(hero.getPositionY()+step+hero.getHeight()*0.85-MapPosY)) &&
-						!island.isSolid((int)(hero.getPositionX()-MapPosX),
-										(int)(hero.getPositionY()+step+hero.getHeight()*0.85-MapPosY))) {
+    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6-MapPosX),
+										(int)(hero.getPositionY()+step+hero.getHeight()*0.9-MapPosY)) &&
+						!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+										(int)(hero.getPositionY()+step+hero.getHeight()*0.9-MapPosY))) {
     					hero.setPositionY(hero.getPositionY()+step);
     			} else if (driftDown && hero.getPositionX() < mWidth-hero.getWidth() &&
-    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8+step-MapPosX),
-										(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
+    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6+step-MapPosX),
+										(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()+step);
     			} else {
 	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
 	    			if (hero.getPositionX() < mWidth-hero.getWidth() &&
-	    					!island.isSolid((int)(hero.getPositionX()+dia+hero.getWidth()*0.8-MapPosX),
-											(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) 
+	    					!island.isSolid((int)(hero.getPositionX()+dia+hero.getWidth()*0.6-MapPosX),
+											(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) 
 	    				hero.setPositionX(hero.getPositionX()+dia);
 	    			if (hero.getPositionY() < mHeight-hero.getHeight() &&
-	    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
-											(int)(hero.getPositionY()+dia+hero.getHeight()*0.85-MapPosY)) &&
-							!island.isSolid((int)(hero.getPositionX()-MapPosX),
-											(int)(hero.getPositionY()+dia+hero.getHeight()*0.85-MapPosY)))
+	    					!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6-MapPosX),
+											(int)(hero.getPositionY()+dia+hero.getHeight()*0.9-MapPosY)) &&
+							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+											(int)(hero.getPositionY()+dia+hero.getHeight()*0.9-MapPosY)))
 	    				hero.setPositionY(hero.getPositionY()+dia);
 	    			gone = true;
 	    		}
     		} else if (down && left) {
     			if (driftDown && driftLeft) {}
     			else if (driftDown && hero.getPositionX() > 0 &&
-    					!island.isSolid((int)(hero.getPositionX()-step-MapPosX),
-										(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
+    					!island.isSolid((int)(hero.getPositionX()-step-MapPosX+hero.getWidth()*0.25),
+										(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()-step);
     				gone = true;
     			} else if (driftLeft && hero.getPositionY() < mHeight-hero.getHeight() &&
-    					!island.isSolid((int)(hero.getPositionX()-MapPosX),
-										(int)(hero.getPositionY()+step+hero.getHeight()*0.85-MapPosY)) &&
-						!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
-										(int)(hero.getPositionY()+step+hero.getHeight()*0.85-MapPosY))) {
+    					!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+										(int)(hero.getPositionY()+step+hero.getHeight()*0.9-MapPosY)) &&
+						!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6-MapPosX),
+										(int)(hero.getPositionY()+step+hero.getHeight()*0.9-MapPosY))) {
     				hero.setPositionY(hero.getPositionY()+step);
     				gone = true;
     			} else {
 	    			float dia = (float) (Math.sqrt(2*(step*step))/2);
 	    			if (hero.getPositionX() > 0 &&
-	    					!island.isSolid((int)(hero.getPositionX()-dia-MapPosX),
-											(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY)))
+	    					!island.isSolid((int)(hero.getPositionX()-dia-MapPosX+hero.getWidth()*0.25),
+											(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY)))
 	    				hero.setPositionX(hero.getPositionX()-dia);
 	    			if (hero.getPositionY() < mHeight-hero.getHeight() &&
-	    					!island.isSolid((int)(hero.getPositionX()-MapPosX),
-											(int)(hero.getPositionY()+dia+hero.getHeight()*0.85-MapPosY)) &&
-							!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
-											(int)(hero.getPositionY()+dia+hero.getHeight()*0.85-MapPosY)))
+	    					!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+											(int)(hero.getPositionY()+dia+hero.getHeight()*0.9-MapPosY)) &&
+							!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6-MapPosX),
+											(int)(hero.getPositionY()+dia+hero.getHeight()*0.9-MapPosY)))
 	    				hero.setPositionY(hero.getPositionY()+dia);
 	    			gone = true;
     			}
     		} else if (left && up) {
     			if (driftLeft && driftUp) {}
     			else if (driftLeft && hero.getPositionY() > 0 &&
-    						!island.isSolid((int)(hero.getPositionX()-MapPosX),
-    										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY)) &&
-    						!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
-    										(int)(hero.getPositionY()-step+hero.getHeight()*0.85-MapPosY))) {
+    						!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+    										(int)(hero.getPositionY()-step+hero.getHeight()*0.9-MapPosY)) &&
+    						!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6-MapPosX),
+    										(int)(hero.getPositionY()-step+hero.getHeight()*0.9-MapPosY))) {
     				hero.setPositionY(hero.getPositionY()-step);
     			} else if (driftUp && hero.getPositionX() > 0 &&
-    						!island.isSolid((int)(hero.getPositionX()-step-MapPosX),
-											(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY))) {
+    						!island.isSolid((int)(hero.getPositionX()-step-MapPosX+hero.getWidth()*0.25),
+											(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) {
     				hero.setPositionX(hero.getPositionX()-step);
     			} else {
     				float dia = (float) (Math.sqrt(2*(step*step))/2);
     				if (hero.getPositionX() > 0 &&
-    						!island.isSolid((int)(hero.getPositionX()-dia-MapPosX),
-											(int)(hero.getPositionY()+hero.getHeight()*0.85-MapPosY)))
+    						!island.isSolid((int)(hero.getPositionX()-dia-MapPosX+hero.getWidth()*0.25),
+											(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY)))
     					hero.setPositionX(hero.getPositionX()-dia);
     				if (hero.getPositionY() > 0 &&
-    						!island.isSolid((int)(hero.getPositionX()-MapPosX),
-											(int)(hero.getPositionY()-dia+hero.getHeight()*0.85-MapPosY)) &&
-							!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.8-MapPosX),
-											(int)(hero.getPositionY()-dia+hero.getHeight()*0.85-MapPosY)))
+    						!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+											(int)(hero.getPositionY()-dia+hero.getHeight()*0.9-MapPosY)) &&
+							!island.isSolid((int)(hero.getPositionX()+hero.getWidth()*0.6-MapPosX),
+											(int)(hero.getPositionY()-dia+hero.getHeight()*0.9-MapPosY)))
     					hero.setPositionY(hero.getPositionY()-dia);
     				gone = true;
     			}
     		} 
     		else if (up && !gone && !driftUp && hero.getPositionY() > 0 && 
-    								!island.isSolid((int)hero.getPositionX()-MapPosX, (int)(hero.getPositionY()-hero.getStepsize()-MapPosY+hero.getHeight()*0.85)) &&
-    								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8),(int)(hero.getPositionY()-hero.getStepsize()-MapPosY+hero.getHeight()*0.85)))
+    								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25), (int)(hero.getPositionY()-hero.getStepsize()-MapPosY+hero.getHeight()*0.9)) &&
+    								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.6),(int)(hero.getPositionY()-hero.getStepsize()-MapPosY+hero.getHeight()*0.9)))
     		{
     			hero.setPositionY(hero.getPositionY()-hero.getStepsize());
     			hero.setLook(0);
 		}
     		else if (right && !gone && !driftRight && hero.getPositionX() < mWidth-hero.getWidth() &&
-    								!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()-MapPosX+hero.getWidth()*0.8), (int)(hero.getPositionY()-MapPosY+hero.getHeight()*0.85)))
+    								!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()-MapPosX+hero.getWidth()*0.6), (int)(hero.getPositionY()-MapPosY+hero.getHeight()*0.9)))
 		{
     			hero.setPositionX(hero.getPositionX()+hero.getStepsize());
     			hero.setLook(2);
 		}
     		else if (down && !gone && !driftDown && hero.getPositionY() < mHeight-hero.getHeight() &&
-    								!island.isSolid((int)hero.getPositionX()-MapPosX, (int)(hero.getPositionY()+hero.getStepsize()-MapPosY+hero.getHeight()-hero.getHeight()*0.15)) &&
-    								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.8), (int)(hero.getPositionY()+hero.getStepsize()-MapPosY+hero.getHeight()*0.85)))
+    								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getStepsize()-MapPosY+hero.getHeight()*0.9)) &&
+    								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getStepsize()-MapPosY+hero.getHeight()*0.9)))
     			{
     			hero.setPositionY(hero.getPositionY()+hero.getStepsize());
     			hero.setLook(4);
     			}
     		else if (left && !gone && !driftLeft && hero.getPositionX() > 0 &&
-    								!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX), (int)(hero.getPositionY()-MapPosY+hero.getHeight()*0.85)))
+    								!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX+hero.getWidth()*0.25), (int)(hero.getPositionY()-MapPosY+hero.getHeight()*0.9)))
     			{
     			hero.setPositionX(hero.getPositionX()-hero.getStepsize());
     			hero.setLook(6);
@@ -713,8 +717,17 @@ public class GamePanel extends JFrame implements Runnable {
 	
 	private void loadMap(String path /* to .TMX mapfile */){
 		state = State.LOADLEVEL;
+		AssetCreator.removeAll();
 		island = new Map(path);
 		AssetCreator.createAssets(island);
+		LinkedList<NPC> npcs = AssetCreator.getNPCs();
+		for(int i=0; i<npcs.size(); i++){
+			NPC npc = npcs.get(i);
+			island.declareSolid((int)npc.getPositionX(), (int)npc.getPositionY());
+			island.declareSolid((int)npc.getPositionX(), (int)(npc.getPositionY() + npc.getImage().getHeight()));
+			island.declareSolid((int)(npc.getPositionX() + npc.getImage().getWidth()), (int)npc.getPositionY());
+			island.declareSolid((int)(npc.getPositionX() + npc.getImage().getWidth()), (int)(npc.getPositionY() + npc.getImage().getHeight()));
+		}
 		state = State.RUN;
 	}
 	/**
@@ -738,6 +751,9 @@ public class GamePanel extends JFrame implements Runnable {
     		}
     		
     		if (state == State.RUN) {
+    			if(e.getKeyCode() == KeyEvent.VK_R && e.isControlDown()){
+    				loadMap("maps/TestMap1.tmx");
+    			}
     			if(drawConversation && e.getKeyCode() == KeyEvent.VK_F) {drawConversation = false; } 
     			else if(drawActionButtonFlag && e.getKeyCode() == KeyEvent.VK_F){
     				pressAction();

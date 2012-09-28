@@ -280,6 +280,15 @@ public class Map implements IGameObject{
 		return true;
 	}
 	
+	public void declareSolid(int x, int y){
+		// Set tile which contains x, y as solid
+		int newx = (x/this.getTileWidth());
+		int newy = (y/this.getTileHeight());
+		if((collision.length > newx) && (collision[0].length > newy) && newx >= 0 && newy >= 0){
+			collision[newx][newy] = true;
+		}
+	}
+	
 	//*************** End of Getter **************************//
 
 }
