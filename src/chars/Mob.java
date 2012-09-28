@@ -28,7 +28,7 @@ public class Mob implements IGameChars {
 	private int rows;
 	private int cols;
 	private int damage = 50;
-	private int hitRange = 30;
+	private int hitRange = 20;
 	private boolean directionForAttack = false;
 	private boolean hit;
 	private boolean heroInRange;
@@ -52,6 +52,7 @@ public class Mob implements IGameChars {
 			        );
 			    }
 			}
+			setHitRange(getWidth()/2);
 			setLook((int) (Math.random()*4));
 			position = new float[2];
 			position[0] = x;
