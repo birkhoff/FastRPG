@@ -101,6 +101,7 @@ public class GamePanel extends JFrame implements Runnable {
 	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
+	private int countFramesForAttackingHero = 0;
 	
 	/**
 	 * Kontruktor
@@ -134,6 +135,7 @@ public class GamePanel extends JFrame implements Runnable {
      * zugreifen muss
      */
     private void gameRender(Graphics2D gScr) {
+    	countFramesForAttackingHero++;
         // Hintergrund faerben
         gScr.setColor(Color.black);
         gScr.fillRect(0, 0, pWidth, pHeight);    
@@ -169,24 +171,27 @@ public class GamePanel extends JFrame implements Runnable {
 				break;
     	}
     	if (debugMode) {
+    		int temp = 1;
     		gScr.setFont(font);
     		gScr.setColor(Color.black);
 	    	gScr.drawString("FPS: "+fps, 20, 20);
-	    	gScr.drawString("Hero Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
+	    	gScr.drawString("Hero: HP = "+hero.getHp()+", Position: x = "+hero.getPositionX()+", y = "+hero.getPositionY(), 20, 40);
 	    	gScr.drawString("Map: x = "+getMapPosX()+", y = "+getMapPosY(), 20, 60);
 	    	gScr.drawString("Keyboard: up: "+up+", right: "+right+", down: "+down+", left: "+left, 20, 80);
 	    	gScr.drawString("Sword: slash: "+slash+", x: "+hero.getSword().getX()+", y: "+hero.getSword().getY()+", damage: "+hero.getSword().getDamage(), 20, 100);
 	    	gScr.drawString("Turbomode: "+turboMode, 20, 120);
 	    	/////////////////////////////////////////// Rechte Seite //////////////////////////////////////////////////////////
-	    	gScr.drawString("Mobs",mWidth-300,20);
-	    	int temp = 2;
 	    	LinkedList<Mob> Mobs = AssetCreator.getMobs();
-        	for (int i = 0; i < Mobs.size(); i++) {
-    			Mob mob = Mobs.get(i);
-    			gScr.drawString("Mob "+temp+": x = "+mob.getPositionX()+", y = "+mob.getPositionY(),mWidth-300,20*temp);
-    			gScr.drawString("IsHeroInRange: "+mob.isHeroInRange(), mWidth-300, 20*(temp+1));
-    			temp += 2;
-    		}
+	    	if (!Mobs.isEmpty()) {
+		    	gScr.drawString("Mobs",mWidth-300,20*temp);
+		    	temp++;
+	        	for (int i = 0; i < Mobs.size(); i++) {
+	    			Mob mob = Mobs.get(i);
+	    			gScr.drawString("Mob "+temp+": x = "+mob.getPositionX()+", y = "+mob.getPositionY(),mWidth-300,20*temp);
+	    			gScr.drawString("IsHeroInRange: "+mob.isHeroInRange(), mWidth-300, 20*(temp+1));
+	    			temp += 2;
+	    		}
+	    	}
     	}
     }
     /**
@@ -603,18 +608,26 @@ public class GamePanel extends JFrame implements Runnable {
 	 */
     private void attackHero(Mob mob) {
     	boolean check = mob.isDirectionForAttack();
+    	int diffX = (int) (mob.getPositionX()+MapPosX-hero.getPositionX());
+    	int diffY = (int) (mob.getPositionY()+MapPosY-hero.getPositionY());
     	if (check) {
-	    		if (mob.getPositionX()+MapPosX-hero.getPositionX() < 0)
-	    			mob.setPositionX(mob.getPositionX()+mob.getStepsize());
-	    		else
-	    			mob.setPositionX(mob.getPositionX()-mob.getStepsize());
-	    		mob.setDirectionForAttack(false);
+			if (diffX < 0)
+    			mob.setPositionX(mob.getPositionX()+mob.getStepsize());
+    		else if (diffX > 0)
+    			mob.setPositionX(mob.getPositionX()-mob.getStepsize());
+    		mob.setDirectionForAttack(false);
     	} else {
-    		if (mob.getPositionY()+MapPosY-hero.getPositionY() < 0)
+			if (diffY < 0)
     			mob.setPositionY(mob.getPositionY()+mob.getStepsize());
-    		else
+    		else if (diffY > 0)
     			mob.setPositionY(mob.getPositionY()-mob.getStepsize());
     		mob.setDirectionForAttack(true);
+    	}
+    	if (diffX < 0) diffX = -diffX;
+    	if (diffY < 0) diffY = -diffY;
+    	if (countFramesForAttackingHero > 100 && (diffX < mob.getHitRange() || diffY < mob.getHitRange())) {
+    		hero.setHp(hero.getHp()-mob.getDamage());
+    		countFramesForAttackingHero = 0;
     	}
 	}
 	/********************************* Bisschen aufraeumen *********************************/
