@@ -83,6 +83,7 @@ public class GamePanel extends JFrame implements Runnable {
 	// Objects
 	private Hero hero;
 	private Map island;
+	private boolean heroGetsSlapped;
 	
 	// Action-Flags
 	private boolean drawActionButtonFlag = false;
@@ -166,6 +167,7 @@ public class GamePanel extends JFrame implements Runnable {
 				drawNPCs(gScr);
 				drawHUD(gScr);
 				drawHero(gScr);	// get ya hero on the screen!
+				drawHitFrame(gScr);
 				break;
 			case PAUSE :
 				break;
@@ -348,6 +350,16 @@ public class GamePanel extends JFrame implements Runnable {
         		g.setColor(Color.ORANGE);
         		g.drawString(conversationText, 20, mHeight-80);
         	}
+    	}
+    }
+    private void drawHitFrame(Graphics g) {
+    	if (heroGetsSlapped && countFramesForAttackingHero < 20) {
+    		g.setColor(Color.RED);
+    		g.fillRect(0, 0, 10, mHeight);
+    		g.fillRect(0, 0, mWidth, 10);
+    		g.fillRect(0, mHeight-10, mWidth, 10);
+    		g.fillRect(mWidth-10, 0, 10, mHeight);
+    		if (countFramesForAttackingHero >= 20) heroGetsSlapped = false;
     	}
     }
     /******************** /Draw Methoden/ *********************/
@@ -611,21 +623,27 @@ public class GamePanel extends JFrame implements Runnable {
     	int diffX = (int) (mob.getPositionX()+MapPosX-hero.getPositionX());
     	int diffY = (int) (mob.getPositionY()+MapPosY-hero.getPositionY());
     	if (check) {
-			if (diffX < 0)
+    		if (diffX == 0) {/* stand still */}
+    		else if (diffX < 0)
     			mob.setPositionX(mob.getPositionX()+mob.getStepsize());
-    		else if (diffX > 0)
+    		else
     			mob.setPositionX(mob.getPositionX()-mob.getStepsize());
     		mob.setDirectionForAttack(false);
     	} else {
-			if (diffY < 0)
+    		if (diffY == 0) {/* stand still */}
+    		else if (diffY < 0)
     			mob.setPositionY(mob.getPositionY()+mob.getStepsize());
-    		else if (diffY > 0)
+    		else
     			mob.setPositionY(mob.getPositionY()-mob.getStepsize());
     		mob.setDirectionForAttack(true);
     	}
-    	if (diffX < 0) diffX = -diffX;
-    	if (diffY < 0) diffY = -diffY;
-    	if (countFramesForAttackingHero > 100 && (diffX < mob.getHitRange() || diffY < mob.getHitRange())) {
+    	// Count 100 fps, than HIT the hero
+    	if (countFramesForAttackingHero > 100 && 
+    			(mob.getPositionX()+mob.getWidth()/2+mob.getHitRange() > hero.getPositionX()+hero.getWidth()/2-MapPosX) &&
+    			(mob.getPositionX()+mob.getWidth()/2-mob.getHitRange() <= hero.getPositionX()+hero.getWidth()/2-MapPosX) &&
+    			(mob.getPositionY()+mob.getHeight()/2+mob.getHitRange() > hero.getPositionY()+hero.getHeight()/2-MapPosY) &&
+    			(mob.getPositionY()+mob.getHeight()/2-mob.getHitRange() <= hero.getPositionY()+hero.getHeight()/2-MapPosY) ) {
+    		heroGetsSlapped = true;
     		hero.setHp(hero.getHp()-mob.getDamage());
     		countFramesForAttackingHero = 0;
     	}

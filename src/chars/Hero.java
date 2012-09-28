@@ -44,7 +44,6 @@ public class Hero implements IGameChars {
 	private int look;
 	private float stamina = 1f;
 	
-	
 	//Loads a SimpleSword
 	public SimpleSword sword;
 	
