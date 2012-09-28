@@ -36,7 +36,7 @@ public class Hero implements IGameChars {
 	private int height;
 	private int rows;
 	private int cols;
-	private boolean slash;
+	private boolean slash = false;
 	private int numberOfSlashSprites;
 	private int oneSlash;
 	private int maxSlash;

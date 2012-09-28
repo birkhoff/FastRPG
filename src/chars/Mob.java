@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 import engine.AssetCreator;
 import interfaces.IGameChars;
 
-
 public class Mob implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
@@ -28,7 +27,9 @@ public class Mob implements IGameChars {
 	private int height;
 	private int rows;
 	private int cols;
+	private boolean directionForAttack = false;
 	private boolean hit;
+	private boolean heroInRange;
 	
 	public Mob(String name, float x, float y) {
 		try {
@@ -57,6 +58,19 @@ public class Mob implements IGameChars {
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
 	}
+	/**
+	 * Check if the hero is in the range of radius. If true KILL HIM!
+	 */
+	public void checkRange(Hero hero, int MapPosX, int MapPosY) {
+		int radius = 300;
+		int[] center = new int[2];
+		center[0] = (int)this.getPositionX()+MapPosX+this.getWidth()/2;
+		center[1] = (int)this.getPositionY()+MapPosY+this.getWidth()/2;
+		if (hero.getPositionX() < center[0]+radius && hero.getPositionX() > center[0]-radius &&
+				hero.getPositionY() < center[1]+radius && hero.getPositionY() > center[1]-radius) {
+			setHeroInRange(true);
+		} else setHeroInRange(false);
+	}
 	private int getCols() {
 		return cols;
 	}
@@ -68,11 +82,9 @@ public class Mob implements IGameChars {
 	}
 	private void setRows(int i) {
 		this.rows = i;
-		
 	}
 	private void setHeight(int i) {
 		this.height = i;
-		
 	}
 	private void setWidth(int i) {
 		this.width = i;
@@ -166,5 +178,17 @@ public class Mob implements IGameChars {
 	}
 	public void setHit(boolean hit) {
 		this.hit = hit;
+	}
+	public boolean isHeroInRange() {
+		return heroInRange;
+	}
+	public void setHeroInRange(boolean heroInRange) {
+		this.heroInRange = heroInRange;
+	}
+	public boolean isDirectionForAttack() {
+		return directionForAttack;
+	}
+	public void setDirectionForAttack(boolean directionForAttack) {
+		this.directionForAttack = directionForAttack;
 	}
 }
