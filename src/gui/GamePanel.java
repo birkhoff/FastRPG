@@ -259,9 +259,9 @@ public class GamePanel extends JFrame implements Runnable {
     		if (debugMode) {
     			g.setColor(Color.BLACK);
     			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getHeight()*0.9), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getHeight()*0.9));
-    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)hero.getPositionY());
-    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.6), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getHeight()*0.9));
-				g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getHeight()*0.9));
+    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()));
+    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getHeight()*0.9));
+				g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()), (int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getHeight()*0.9));
 			}
     	}
     }
