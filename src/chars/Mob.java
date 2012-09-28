@@ -61,11 +61,11 @@ public class Mob implements IGameChars {
 	/**
 	 * Check if the hero is in the range of radius. If true KILL HIM!
 	 */
-	public void checkRange(Hero hero) {
-		int radius = 100;
+	public void checkRange(Hero hero, int MapPosX, int MapPosY) {
+		int radius = 300;
 		int[] center = new int[2];
-		center[0] = (int)this.getPositionX()+this.getWidth()/2;
-		center[1] = (int)this.getPositionY()+this.getWidth()/2;
+		center[0] = (int)this.getPositionX()+MapPosX+this.getWidth()/2;
+		center[1] = (int)this.getPositionY()+MapPosY+this.getWidth()/2;
 		if (hero.getPositionX() < center[0]+radius && hero.getPositionX() > center[0]-radius &&
 				hero.getPositionY() < center[1]+radius && hero.getPositionY() > center[1]-radius) {
 			setHeroInRange(true);
@@ -82,11 +82,9 @@ public class Mob implements IGameChars {
 	}
 	private void setRows(int i) {
 		this.rows = i;
-		
 	}
 	private void setHeight(int i) {
 		this.height = i;
-		
 	}
 	private void setWidth(int i) {
 		this.width = i;
