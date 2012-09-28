@@ -94,6 +94,11 @@ public class GamePanel extends JFrame implements Runnable {
 	private float pixelsrolled = 0;
 	private float oldstepsize = 3f;
 	
+	//HUD
+	private boolean HUDflag = true;
+	int hudx;
+	int hudy;
+	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
 	
@@ -107,6 +112,8 @@ public class GamePanel extends JFrame implements Runnable {
         initFullScreen();
         readyForTermination();
         loadMap("maps/TestMap1.tmx");
+        hudx = this.getWidth()/2-250;
+        hudy = this.getHeight()-100;
         gameStart();
     }
     
@@ -117,6 +124,8 @@ public class GamePanel extends JFrame implements Runnable {
         initFullScreen();
         readyForTermination();
         loadMap(pathToTMX);
+        hudx = this.getWidth()/2-250;
+        hudy = this.getHeight()-100;
         gameStart();
     }
 
@@ -301,17 +310,30 @@ public class GamePanel extends JFrame implements Runnable {
     }
     
     private void drawHUD(Graphics g){
-    	if(drawActionButtonFlag){
-    		g.setColor(Color.WHITE);
-    		g.fillRect((int)hero.getPositionX()-80, (int)hero.getPositionY()+65, 100, 25);
+    	if(HUDflag){
+    		// Position of HUDBox
     		g.setColor(Color.BLACK);
-    		g.drawString("Action   [F]", (int)hero.getPositionX()-70, (int)hero.getPositionY()+85);
-    	}
-    	if(drawConversation){
-    		g.setColor(Color.DARK_GRAY);
-    		g.fillRect(0, mHeight-100, mWidth, 100);
-    		g.setColor(Color.ORANGE);
-    		g.drawString(conversationText, 20, mHeight-80);
+    		//draw the box
+    		g.fillRect(hudx, hudy, 500, 100);
+    		//draw the stamina-bar
+    		g.setColor(Color.GRAY);
+    		g.fillRect(hudx+20, hudy+10, 50, 10);
+    		g.setColor(Color.GREEN);
+    		g.fillRect(hudx+20, hudy+10, (int)(50*hero.getStamina()), 10);
+    		g.setColor(Color.BLACK);
+    		g.drawLine(hudx+45, hudy+10, hudx+45, hudy+20);
+        	if(drawActionButtonFlag){
+        		g.setColor(Color.WHITE);
+        		g.fillRect((int)hero.getPositionX()-80, (int)hero.getPositionY()+65, 100, 25);
+        		g.setColor(Color.BLACK);
+        		g.drawString("Action   [F]", (int)hero.getPositionX()-70, (int)hero.getPositionY()+85);
+        	}
+        	if(drawConversation){
+        		g.setColor(Color.DARK_GRAY);
+        		g.fillRect(0, mHeight-100, mWidth, 100);
+        		g.setColor(Color.ORANGE);
+        		g.drawString(conversationText, 20, mHeight-80);
+        	}
     	}
     }
     /******************** /Draw Methoden/ *********************/
@@ -755,6 +777,15 @@ public class GamePanel extends JFrame implements Runnable {
 	    					System.out.println(hero.getStamina());
 	    				}
 	    				break;
+	    			case KeyEvent.VK_L: try {
+							AudioPlayerInstance bgsound = new AudioPlayerInstance();
+							bgsound.playSound("./sounds/NoMercy.wav");
+						} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						}
+	    				break;
+	    				
 	    			default: break;
 	    		}
         	}
@@ -775,6 +806,8 @@ public class GamePanel extends JFrame implements Runnable {
 		@Override
 		public void keyTyped(KeyEvent e) {}
     }
+    
+    
     public int getMapPosX() {
 		return MapPosX;
 	}
