@@ -94,6 +94,11 @@ public class GamePanel extends JFrame implements Runnable {
 	private float pixelsrolled = 0;
 	private float oldstepsize = 3f;
 	
+	//HUD
+	private boolean HUDflag = true;
+	int hudx;
+	int hudy;
+	
 	// Dont know
 	private float tolerance;	// Tolerance of 1 Pixel for drifting the map
 	private int countFramesForAttackingHero = 0;
@@ -108,6 +113,8 @@ public class GamePanel extends JFrame implements Runnable {
         initFullScreen();
         readyForTermination();
         loadMap("maps/TestMap1.tmx");
+        hudx = this.getWidth()/2-250;
+        hudy = this.getHeight()-100;
         gameStart();
     }
     
@@ -118,6 +125,8 @@ public class GamePanel extends JFrame implements Runnable {
         initFullScreen();
         readyForTermination();
         loadMap(pathToTMX);
+        hudx = this.getWidth()/2-250;
+        hudy = this.getHeight()-100;
         gameStart();
     }
 
@@ -273,9 +282,9 @@ public class GamePanel extends JFrame implements Runnable {
     		if (debugMode) {
     			g.setColor(Color.BLACK);
     			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getHeight()*0.9), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getHeight()*0.9));
-    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)hero.getPositionY());
-    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.6), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getHeight()*0.9));
-				g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)hero.getPositionY(), (int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getHeight()*0.9));
+    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()));
+    			g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()), (int)(hero.getPositionX()+hero.getWidth()*0.6), (int)(hero.getPositionY()+hero.getHeight()*0.9));
+				g.drawLine((int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()), (int)(hero.getPositionX()+hero.getWidth()*0.25), (int)(hero.getPositionY()+hero.getHeight()*0.9));
 			}
     	}
     }
@@ -315,17 +324,30 @@ public class GamePanel extends JFrame implements Runnable {
     }
     
     private void drawHUD(Graphics g){
-    	if(drawActionButtonFlag){
-    		g.setColor(Color.WHITE);
-    		g.fillRect((int)hero.getPositionX()-80, (int)hero.getPositionY()+65, 100, 25);
+    	if(HUDflag){
+    		// Position of HUDBox
     		g.setColor(Color.BLACK);
-    		g.drawString("Action   [F]", (int)hero.getPositionX()-70, (int)hero.getPositionY()+85);
-    	}
-    	if(drawConversation){
-    		g.setColor(Color.DARK_GRAY);
-    		g.fillRect(0, mHeight-100, mWidth, 100);
-    		g.setColor(Color.ORANGE);
-    		g.drawString(conversationText, 20, mHeight-80);
+    		//draw the box
+    		g.fillRect(hudx, hudy, 500, 100);
+    		//draw the stamina-bar
+    		g.setColor(Color.GRAY);
+    		g.fillRect(hudx+20, hudy+10, 50, 10);
+    		g.setColor(Color.GREEN);
+    		g.fillRect(hudx+20, hudy+10, (int)(50*hero.getStamina()), 10);
+    		g.setColor(Color.BLACK);
+    		g.drawLine(hudx+45, hudy+10, hudx+45, hudy+20);
+        	if(drawActionButtonFlag){
+        		g.setColor(Color.WHITE);
+        		g.fillRect((int)hero.getPositionX()-80, (int)hero.getPositionY()+65, 100, 25);
+        		g.setColor(Color.BLACK);
+        		g.drawString("Action   [F]", (int)hero.getPositionX()-70, (int)hero.getPositionY()+85);
+        	}
+        	if(drawConversation){
+        		g.setColor(Color.DARK_GRAY);
+        		g.fillRect(0, mHeight-100, mWidth, 100);
+        		g.setColor(Color.ORANGE);
+        		g.drawString(conversationText, 20, mHeight-80);
+        	}
     	}
     }
     /******************** /Draw Methoden/ *********************/
@@ -339,34 +361,34 @@ public class GamePanel extends JFrame implements Runnable {
     		float[] center = Lib.getCenter(hero);
     		// Oberer und unterer Rand
     		if (hero.getPositionY() < mHeight*drift - center[1] && up &&
-    							!island.isSolid((int)(hero.getPositionX()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.65-hero.getStepsize()-MapPosY)) &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9-hero.getStepsize()-MapPosY)) &&
     							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.6),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.65-hero.getStepsize()-MapPosY))) {
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9-hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()+tolerance < 0) {
     				driftUp = true;
     				setMapPosY(getMapPosY() + (int) hero.getStepsize());	
     			}
     		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down &&
-    							!island.isSolid((int)(hero.getPositionX()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.65+hero.getStepsize()-MapPosY)) &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9+hero.getStepsize()-MapPosY)) &&
 								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.6),
-												(int)(hero.getPositionY()+hero.getHeight()*0.65+hero.getStepsize()-MapPosY))) {
+												(int)(hero.getPositionY()+hero.getHeight()*0.9+hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()-tolerance >= (-1)*(island.getHeight()-mHeight)) {
     				driftDown = true;
     				setMapPosY(getMapPosY() + (int) ((-1)*hero.getStepsize()));
     			}
     		} 
     		if (hero.getPositionX() < (mWidth*drift) - center[0] && left &&
-    							!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.6-MapPosY))) {
+    							!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX+hero.getWidth()*0.25),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) {
     			if (getMapPosX()+tolerance < 0) {
     				driftLeft = true;
     				setMapPosX(getMapPosX() + (int) hero.getStepsize());
     			}
     		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right &&
     							!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()+hero.getWidth()*0.6-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.6-MapPosY))) {
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) {
     			if (getMapPosX()-tolerance >= (-1)*(island.getWidth()-mWidth)) {
     				driftRight = true;
     				setMapPosX(getMapPosX() + (int) ((-1)*hero.getStepsize()));
@@ -800,6 +822,15 @@ public class GamePanel extends JFrame implements Runnable {
 	    					System.out.println(hero.getStamina());
 	    				}
 	    				break;
+	    			case KeyEvent.VK_L: try {
+							AudioPlayerInstance bgsound = new AudioPlayerInstance();
+							bgsound.playSound("./sounds/NoMercy.wav");
+						} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						}
+	    				break;
+	    				
 	    			default: break;
 	    		}
         	}
@@ -820,6 +851,8 @@ public class GamePanel extends JFrame implements Runnable {
 		@Override
 		public void keyTyped(KeyEvent e) {}
     }
+    
+    
     public int getMapPosX() {
 		return MapPosX;
 	}
