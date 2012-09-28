@@ -185,6 +185,11 @@ public class Map implements IGameObject{
 		return drawnWorld;
 	}
 	
+	public void killImage(){
+		//To trash old map and free up space
+		drawnWorld = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+	}
+	
 	//*************** Map-Attribute-Getter *******************//
 	
 	public String getOrientation(){

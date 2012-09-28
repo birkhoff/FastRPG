@@ -761,6 +761,7 @@ public class GamePanel extends JFrame implements Runnable {
 	private void loadMap(String path /* to .TMX mapfile */){
 		state = State.LOADLEVEL;
 		AssetCreator.removeAll();
+		island = null;
 		island = new Map(path);
 		AssetCreator.createAssets(island);
 		LinkedList<NPC> npcs = AssetCreator.getNPCs();
