@@ -27,6 +27,8 @@ public class Mob implements IGameChars {
 	private int height;
 	private int rows;
 	private int cols;
+	private int damage = 50;
+	private int hitRange = 30;
 	private boolean directionForAttack = false;
 	private boolean hit;
 	private boolean heroInRange;
@@ -66,8 +68,8 @@ public class Mob implements IGameChars {
 		int[] center = new int[2];
 		center[0] = (int)this.getPositionX()+MapPosX+this.getWidth()/2;
 		center[1] = (int)this.getPositionY()+MapPosY+this.getWidth()/2;
-		if (hero.getPositionX() < center[0]+radius && hero.getPositionX() > center[0]-radius &&
-				hero.getPositionY() < center[1]+radius && hero.getPositionY() > center[1]-radius) {
+		if (hero.getPositionX()+hero.getWidth()/2 < center[0]+radius && hero.getPositionX()+hero.getWidth()/2 > center[0]-radius &&
+				hero.getPositionY()-hero.getHeight()/2 < center[1]+radius && hero.getPositionY()-hero.getHeight()/2 > center[1]-radius) {
 			setHeroInRange(true);
 		} else setHeroInRange(false);
 	}
@@ -190,5 +192,17 @@ public class Mob implements IGameChars {
 	}
 	public void setDirectionForAttack(boolean directionForAttack) {
 		this.directionForAttack = directionForAttack;
+	}
+	public int getHitRange() {
+		return hitRange;
+	}
+	public void setHitRange(int hitRange) {
+		this.hitRange = hitRange;
+	}
+	public int getDamage() {
+		return damage;
+	}
+	public void setDamage(int damage) {
+		this.damage = damage;
 	}
 }

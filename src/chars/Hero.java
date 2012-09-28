@@ -24,7 +24,7 @@ public class Hero implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
 	BufferedImage[] hero;
-	private int hp;
+	private int hp = 1000;
 	private String name = "Insane";
 	private int i = 0;
 	private int k = 0;
