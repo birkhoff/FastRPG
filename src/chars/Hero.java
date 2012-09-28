@@ -270,7 +270,7 @@ public class Hero implements IGameChars {
 	
 	public void regenerateStamina(){
 		if (stamina < 1f)
-			stamina += 0.015f;
+			stamina += 0.0015f;
 	}
 	
 	public void loseStamina(float loss){

@@ -20,6 +20,11 @@ public class AssetCreator {
 		getNPCSFromMap(island);
 	}
 	
+	public static void removeAll(){
+		Mobs.removeAll(Mobs);
+		NPCs.removeAll(NPCs);
+	}
+	
 	private static void getEnemiesFromMap(Map island) {
 		if (island.getObjectGroup("mobs") != null) {
 			Objectgroup group = island.getObjectGroup("mobs");
