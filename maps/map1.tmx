@@ -9,9 +9,6 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="49" name="Test" tilewidth="32" tileheight="32">
-  <image source="../../../drinking_games/ragedrinkrt6cb.png" width="4200" height="2600"/>
- </tileset>
  <layer name="Background" width="30" height="20">
   <data encoding="csv">
 6,6,7,6,6,7,8,23,9,10,11,26,25,26,26,8,8,16,23,24,24,23,24,32,31,32,31,32,32,32,
