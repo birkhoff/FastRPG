@@ -325,34 +325,34 @@ public class GamePanel extends JFrame implements Runnable {
     		float[] center = Lib.getCenter(hero);
     		// Oberer und unterer Rand
     		if (hero.getPositionY() < mHeight*drift - center[1] && up &&
-    							!island.isSolid((int)(hero.getPositionX()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.65-hero.getStepsize()-MapPosY)) &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9-hero.getStepsize()-MapPosY)) &&
     							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.6),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.65-hero.getStepsize()-MapPosY))) {
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9-hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()+tolerance < 0) {
     				driftUp = true;
     				setMapPosY(getMapPosY() + (int) hero.getStepsize());	
     			}
     		} else if (hero.getPositionY() >= mHeight - (mWidth*drift) - center[1] && down &&
-    							!island.isSolid((int)(hero.getPositionX()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.65+hero.getStepsize()-MapPosY)) &&
+    							!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.25),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9+hero.getStepsize()-MapPosY)) &&
 								!island.isSolid((int)(hero.getPositionX()-MapPosX+hero.getWidth()*0.6),
-												(int)(hero.getPositionY()+hero.getHeight()*0.65+hero.getStepsize()-MapPosY))) {
+												(int)(hero.getPositionY()+hero.getHeight()*0.9+hero.getStepsize()-MapPosY))) {
     			if (getMapPosY()-tolerance >= (-1)*(island.getHeight()-mHeight)) {
     				driftDown = true;
     				setMapPosY(getMapPosY() + (int) ((-1)*hero.getStepsize()));
     			}
     		} 
     		if (hero.getPositionX() < (mWidth*drift) - center[0] && left &&
-    							!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.6-MapPosY))) {
+    							!island.isSolid((int)(hero.getPositionX()-hero.getStepsize()-MapPosX+hero.getWidth()*0.25),
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) {
     			if (getMapPosX()+tolerance < 0) {
     				driftLeft = true;
     				setMapPosX(getMapPosX() + (int) hero.getStepsize());
     			}
     		} else if (hero.getPositionX() >= mWidth - (mWidth*drift) - center[0] && right &&
     							!island.isSolid((int)(hero.getPositionX()+hero.getStepsize()+hero.getWidth()*0.6-MapPosX),
-    											(int)(hero.getPositionY()+hero.getHeight()*0.6-MapPosY))) {
+    											(int)(hero.getPositionY()+hero.getHeight()*0.9-MapPosY))) {
     			if (getMapPosX()-tolerance >= (-1)*(island.getWidth()-mWidth)) {
     				driftRight = true;
     				setMapPosX(getMapPosX() + (int) ((-1)*hero.getStepsize()));
