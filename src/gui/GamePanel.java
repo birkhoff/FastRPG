@@ -1,6 +1,6 @@
 /**
  * Fullscreen FSEM Engine
- * 07. September 2012
+ * Heart of the Engine. Here is where the magic happens
  */
 package gui;
 
@@ -105,7 +105,7 @@ public class GamePanel extends JFrame implements Runnable {
 	private int countFramesForAttackingHero = 0;
 	
 	/**
-	 * Kontruktor
+	 * Constructor
 	 */
     public GamePanel(long period) {
         super("Insane Engine!");

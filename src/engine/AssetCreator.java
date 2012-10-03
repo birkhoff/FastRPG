@@ -1,6 +1,6 @@
 /**
  * Creates objects, mobs, npcs, ...
- * Objects MUST be located in a new objectgroup on 
+ * Objects MUST be located in a new objectgroup in the TMX-File
  */
 
 package engine;
@@ -15,6 +15,7 @@ public class AssetCreator {
 	private static LinkedList<Mob> Mobs = new LinkedList<Mob>();
 	private static LinkedList<NPC> NPCs = new LinkedList<NPC>();
 	
+	// Method creates all Assets from the Map <island>
 	public static void createAssets(Map island) {
 		getEnemiesFromMap(island);
 		getNPCSFromMap(island);

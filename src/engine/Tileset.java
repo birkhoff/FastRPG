@@ -1,3 +1,7 @@
+/**
+ * Class representation of the TMX-File attribute Tileset 
+ */
+
 package engine;
 
 import java.util.ArrayList;

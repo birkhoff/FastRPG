@@ -1,3 +1,8 @@
+/**
+ * Generic Class for NPCs (that are not hostile Mobs). Every NPC has its own conversation String, which can be changed out
+ * to display his or her current Sentence.
+ */
+
 package chars;
 
 import java.awt.Image;
@@ -13,7 +18,7 @@ import javax.imageio.ImageIO;
 public class NPC {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
-	private int hp;
+	private int hp = 1000;
 	private String name = "";
 	private String conversation = "Lass uns Wildschweine jagen gehen";
 
@@ -32,6 +37,9 @@ public class NPC {
 		position[0] = x;
 		position[1] = y;
 	}
+	
+	
+	// *******  Getter and Setter *****************
 	public Image toImage(BufferedImage bufferedImage) {
 	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
 	}

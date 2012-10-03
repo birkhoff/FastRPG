@@ -1,3 +1,7 @@
+/**
+ * Class Representation of the TMX-File attribute Property
+ */
+
 package engine;
 
 public class Property {

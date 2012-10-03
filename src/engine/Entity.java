@@ -1,3 +1,7 @@
+/**
+ * Things that are referred to as "Object" in the TMX-Files are stored in this Entity-Object
+ */
+
 package engine;
 
 public class Entity {
@@ -6,6 +10,7 @@ public class Entity {
 	private int x, y, height, width;
 	private Property[] properties;
 	private boolean propertyFlag = false;
+	//Flag indicates wether this object has properties, or not
 	
 	public Entity(String name, int x, int y){
 		this.name = name;

@@ -1,3 +1,8 @@
+/**
+ * Upon creaton of the Map-Object the supplied TMX-File is parsed, and all
+ * classes, that are needed get created. Has a lot of Getter for most Map related Objects
+ */
+
 package engine;
 
 import interfaces.*;
@@ -6,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -15,8 +19,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.DOMOutputter;
-import org.jdom2.output.XMLOutputter;
 
 // Has the ability to read out *TMX-Files and build a Map out of them
 public class Map implements IGameObject{

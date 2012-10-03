@@ -1,3 +1,7 @@
+/**
+ * This class represents a Layer f the Map with a name and a unformatted tile-Stirng
+ */
+
 package engine;
 
 public class Layer {

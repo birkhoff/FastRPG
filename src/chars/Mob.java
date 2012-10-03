@@ -1,3 +1,7 @@
+/**
+ *  The generic Mob. Can be extended into more specific Mobs with more function.
+ */
+
 package chars;
 
 import java.awt.Image;
@@ -61,9 +65,11 @@ public class Mob implements IGameChars {
 			System.out.println("Bild von "+this.name+" konnte nicht geladen werden.");
 		}
 	}
+	
 	/**
-	 * Check if the hero is in the range of radius. If true KILL HIM!
+	 * Check if the hero is in the range of radius. If true KILL HIM! (EX-TER-MINATE :D)
 	 */
+	
 	public void checkRange(Hero hero, int MapPosX, int MapPosY) {
 		int radius = 300;
 		int[] center = new int[2];
@@ -74,6 +80,10 @@ public class Mob implements IGameChars {
 			setHeroInRange(true);
 		} else setHeroInRange(false);
 	}
+	
+	/******************* Getter and Setter ******************/
+	
+	
 	private int getCols() {
 		return cols;
 	}
@@ -119,7 +129,7 @@ public class Mob implements IGameChars {
 	public int getLook(){
 		return this.look;
 	}
-	/******************* Getter und Setter ******************/
+	
 	public float getPositionX() {
 		return position[0];
 	}

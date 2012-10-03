@@ -1,3 +1,7 @@
+/**
+ * Start of the Engine. Mainly to execute the Program for the First time
+ */
+
 package engine;
 
 import gui.GamePanel;

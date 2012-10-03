@@ -1,5 +1,6 @@
 /**
- * The Hero class. Having attributes, position and the image file
+ * The Hero class. Having attributes, position and the image file of the Hero. 
+ * Non-Generic Heroes can be extended from this class 
  */
 package chars;
 
@@ -14,8 +15,7 @@ import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 
-import engine.AssetCreator;
-import engine.Main;
+import engine.*;
 
 import weapons.SimpleSword;
 
@@ -23,7 +23,7 @@ import weapons.SimpleSword;
 public class Hero implements IGameChars {
 	private float position[];		// 0 = x position, 1 = y position
 	private BufferedImage image;
-	BufferedImage[] hero;
+	BufferedImage[] hero;			// Sprite for Animation
 	private int hp = 1000;
 	private String name = "Insane";
 	private int i = 0;
@@ -62,6 +62,7 @@ public class Hero implements IGameChars {
 			hero = new BufferedImage[getRows() * getCols()];
 			sword = new SimpleSword();
 
+			//calculate the Animation-Images from the Spritesheet
 			for (int i = 0; i < getRows(); i++) {
 			    for (int j = 0; j < getCols(); j++) {
 			        hero[(i * getCols()) + j] = image.getSubimage(

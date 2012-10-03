@@ -1,3 +1,8 @@
+/**
+ * Class representation of the TMX-File attribute Objectgroup
+ */
+
+
 package engine;
 
 public class Objectgroup {
